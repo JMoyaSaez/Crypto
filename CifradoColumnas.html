@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>CryptoLab – Cifrado por Columnas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    :root {
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --radius-sm: 10px;
+
+      --font-main: system-ui, -apple-system, "Segoe UI", sans-serif;
+      --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    /* Tema oscuro */
+    :root[data-theme="dark"] {
+      --bg: radial-gradient(circle at top, #1e293b 0, #020617 55%);
+      --bg-card: #111729;
+      --bg-card-soft: rgba(15, 23, 42, 0.9);
+
+      --accent: #f97316;
+      --accent-soft: rgba(249, 115, 22, 0.18);
+
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border-soft: rgba(148, 163, 184, 0.25);
+      --border-strong: rgba(148, 163, 184, 0.4);
+
+      --danger: #f97373;
+      --output-bg: #020617;
+    }
+
+    /* Tema claro */
+    :root[data-theme="light"] {
+      --bg: radial-gradient(circle at top, #e2e8f0 0, #ffffff 55%);
+      --bg-card: #ffffff;
+      --bg-card-soft: #f8fafc;
+
+      --accent: #ea580c;
+      --accent-soft: rgba(234, 88, 12, 0.16);
+
+      --text: #0f172a;
+      --muted: #64748b;
+      --border-soft: rgba(148, 163, 184, 0.4);
+      --border-strong: rgba(148, 163, 184, 0.7);
+
+      --danger: #e11d48;
+      --output-bg: #f1f5f9;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-main);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      transition: background 0.4s ease, color 0.2s ease;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 1000px;
+      background: linear-gradient(135deg, var(--accent-soft), transparent);
+      border-radius: var(--radius-lg);
+      padding: 1.8rem;
+      box-shadow: 0 25px 60px rgba(15, 23, 42, 0.35);
+      border: 1px solid var(--border-soft);
+      backdrop-filter: blur(14px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .app::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(148, 163, 184, 0.12), transparent 55%);
+      pointer-events: none;
+    }
+
+    header {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      z-index: 1;
+      margin-bottom: 1.2rem;
+    }
+
+    h1 {
+      font-size: 1.7rem;
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    h1 span.logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      border: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      color: var(--accent);
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .tagline {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* Botón de tema */
+    .theme-toggle {
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      background: var(--bg-card-soft);
+      color: var(--text);
+      font-size: 0.8rem;
+      padding: 0.3rem 0.75rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.2);
+      transition: background 0.15s ease, transform 0.08s ease, box-shadow 0.08s ease, border-color 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .theme-toggle:hover {
+      transform: translateY(-1px);
+      border-color: var(--accent);
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.28);
+    }
+
+    .theme-toggle:active {
+      transform: translateY(1px);
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.35);
+    }
+
+    .theme-toggle-icon {
+      font-size: 1rem;
+    }
+
+    .grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 1.2rem;
+      margin-top: 0.4rem;
+    }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+      header { flex-direction: column; align-items: flex-start; }
+      .theme-toggle { align-self: flex-end; }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.1rem;
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.25);
+    }
+
+    .card h2 {
+      font-size: 1.1rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .card p {
+      font-size: 0.86rem;
+      color: var(--muted);
+      margin-bottom: 0.9rem;
+    }
+
+    label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 0.2rem;
+      display: block;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 110px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-strong);
+      background: var(--bg-card-soft);
+      color: var(--text);
+      padding: 0.6rem 0.7rem;
+      resize: vertical;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    textarea::placeholder {
+      color: var(--muted);
+    }
+
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft);
+    }
+
+    input[type="text"] {
+      width: 100%;
+      border-radius: 999px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-card-soft);
+      color: var(--text);
+      padding: 0.4rem 0.7rem;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    input[type="text"]::placeholder {
+      color: var(--muted);
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft);
+    }
+
+    .row {
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+      margin-top: 0.6rem;
+      margin-bottom: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .mode-buttons {
+      display: inline-flex;
+      gap: 0.4rem;
+      background: rgba(15, 23, 42, 0.35);
+      border-radius: 999px;
+      padding: 0.15rem;
+      border: 1px solid var(--border-soft);
+    }
+
+    .mode-btn {
+      border-radius: 999px;
+      padding: 0.3rem 0.75rem;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: background 0.12s ease, color 0.12s ease;
+      white-space: nowrap;
+    }
+
+    .mode-btn.active {
+      background: var(--accent);
+      color: #0f172a;
+      font-weight: 600;
+    }
+
+    button.action {
+      border-radius: 999px;
+      border: none;
+      padding: 0.45rem 1.1rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      background: var(--accent);
+      color: #0f172a;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      box-shadow: 0 12px 30px rgba(249, 115, 22, 0.45);
+      transition: transform 0.07s ease, box-shadow 0.07s ease;
+      white-space: nowrap;
+    }
+
+    button.action:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 35px rgba(249, 115, 22, 0.6);
+    }
+
+    button.action:active {
+      transform: translateY(1px);
+      box-shadow: 0 7px 18px rgba(15, 23, 42, 0.9);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.72rem;
+      padding: 0.25rem 0.55rem;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.12);
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .output {
+      margin-top: 0.4rem;
+      font-family: var(--font-mono);
+      font-size: 0.86rem;
+      background: var(--output-bg);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem 0.6rem;
+      border: 1px solid var(--border-strong);
+      min-height: 60px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .output-label {
+      margin-top: 0.4rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .matrix {
+      margin-top: 0.4rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      background: var(--bg-card-soft);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-soft);
+      padding: 0.6rem 0.7rem;
+      max-height: 260px;
+      overflow-x: auto;
+      overflow-y: auto;
+      white-space: pre;
+    }
+
+    .hint {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.4rem;
+    }
+
+    .highlight {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .footer {
+      margin-top: 1rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <h1>
+          <span class="logo">TC</span>
+          CryptoLab – Cifrado por Columnas
+        </h1>
+        <p class="subtitle">
+          Visualiza cómo el mensaje se reparte en una tabla y cómo la clave reordena las columnas.
+        </p>
+        <p class="tagline">
+          Uso típico en clase: que vean la <span class="highlight">matriz</span> y entiendan la permutación.
+        </p>
+      </div>
+
+      <button id="theme-toggle" class="theme-toggle" type="button">
+        <span class="theme-toggle-icon">🌙</span>
+        <span class="theme-toggle-label">Modo oscuro</span>
+      </button>
+    </header>
+
+    <div class="grid">
+      <!-- Panel izquierdo: Entrada y opciones -->
+      <section class="card">
+        <div class="pill">Transposición • Clave por palabra</div>
+        <h2>1. Escribe el mensaje y la clave</h2>
+        <p>
+          El texto se normaliza eliminando espacios y pasando a mayúsculas.
+          La clave define el número de columnas y el orden de lectura (según el orden alfabético
+          de las letras de la clave).
+        </p>
+
+        <label for="text-input">Mensaje</label>
+        <textarea id="text-input" placeholder="Ejemplo: ATAQUE AL AMANECER"></textarea>
+
+        <div class="row">
+          <div style="flex: 1 1 160px;">
+            <label for="key-input">Clave (palabra)</label>
+            <input id="key-input" type="text" placeholder="Ejemplo: CLAVE">
+          </div>
+
+          <div>
+            <label>Modo</label>
+            <div class="mode-buttons">
+              <button type="button" class="mode-btn active" data-mode="encrypt">Cifrar</button>
+              <button type="button" class="mode-btn" data-mode="decrypt">Descifrar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="row" style="justify-content: space-between;">
+          <button id="btn-run" class="action" type="button">
+            ▶ Ejecutar
+          </button>
+          <span style="font-size:0.8rem;color:var(--muted);">
+            Relleno con <span class="highlight">X</span> si falta completar la tabla.
+          </span>
+        </div>
+
+        <div class="output-label">Texto normalizado</div>
+        <div id="normalized" class="output"></div>
+
+        <div class="output-label">
+          <span id="result-label">Cifrado</span>
+        </div>
+        <div id="result" class="output"></div>
+      </section>
+
+      <!-- Panel derecho: Matriz visual -->
+      <section class="card">
+        <div class="pill">Visualización • Matriz de columnas</div>
+        <h2>2. Matriz de transposición</h2>
+        <p>
+          La primera fila muestra la clave y el orden de sus letras.
+          Debajo, el mensaje se reparte por filas. Al cifrar, se leen las columnas
+          según el orden alfabético de la clave.
+        </p>
+
+        <div id="matrix" class="matrix">
+          <!-- matriz generada por JS -->
+        </div>
+
+        <p class="hint">
+          Actividad: que los alumnos reconstruyan a mano la tabla a partir del texto cifrado y la clave,
+          y comprueben su resultado con la app.
+        </p>
+      </section>
+    </div>
+
+    <div class="footer">
+      <span>Idea: combina esta app con la de César para comparar sustitución vs. transposición.</span>
+      <span>Extensión: probad claves con letras repetidas y comentad qué ocurre.</span>
+    </div>
+  </div>
+
+  <script>
+    // ---------- Lógica de cifrado por columnas ----------
+
+    function normalizeText(text) {
+      // Eliminamos espacios y pasamos a mayúsculas. Dejamos solo letras A-Z.
+      return (text || "")
+        .toUpperCase()
+        .replace(/[^A-ZÑ]/g, "") // puedes cambiar si no quieres Ñ
+        .replace(/Ñ/g, "N"); // simplificación para la demo
+    }
+
+    function normalizeKey(key) {
+      return (key || "")
+        .toUpperCase()
+        .replace(/[^A-Z]/g, "");
+    }
+
+    function getColumnOrder(key) {
+      // Devuelve un array de índices de columnas ordenadas según el orden alfabético de la clave.
+      // Si hay letras repetidas, se usa el índice original como desempate.
+      const letters = key.split("");
+      const indexed = letters.map((ch, idx) => ({ ch, idx }));
+      indexed.sort((a, b) => {
+        if (a.ch < b.ch) return -1;
+        if (a.ch > b.ch) return 1;
+        return a.idx - b.idx;
+      });
+      return indexed.map(obj => obj.idx);
+    }
+
+    function buildMatrixFromPlaintext(cleanText, key, padChar = "X") {
+      const cols = key.length;
+      if (cols === 0) return { rows: 0, cols: 0, matrix: [] };
+      const rows = Math.ceil(cleanText.length / cols);
+      const matrix = [];
+      let pos = 0;
+
+      for (let r = 0; r < rows; r++) {
+        const row = [];
+        for (let c = 0; c < cols; c++) {
+          if (pos < cleanText.length) {
+            row.push(cleanText[pos]);
+          } else {
+            row.push(padChar);
+          }
+          pos++;
+        }
+        matrix.push(row);
+      }
+      return { rows, cols, matrix };
+    }
+
+    function encryptColumnar(cleanText, key) {
+      const { rows, cols, matrix } = buildMatrixFromPlaintext(cleanText, key);
+      const order = getColumnOrder(key);
+      let cipher = "";
+      for (const colIndex of order) {
+        for (let r = 0; r < rows; r++) {
+          cipher += matrix[r][colIndex];
+        }
+      }
+      return { cipher, rows, cols, matrix, order };
+    }
+
+    function decryptColumnar(cipherText, key) {
+      const cols = key.length;
+      const len = cipherText.length;
+      if (cols === 0 || len === 0) {
+        return { plain: "", rows: 0, cols: 0, matrix: [], order: [] };
+      }
+      const rows = Math.ceil(len / cols);
+      const order = getColumnOrder(key);
+      const matrix = Array.from({ length: rows }, () => Array(cols).fill(""));
+
+      let pos = 0;
+      // Rellenar matriz por columnas en el orden de la clave
+      for (const colIndex of order) {
+        for (let r = 0; r < rows; r++) {
+          if (pos < len) {
+            matrix[r][colIndex] = cipherText[pos++];
+          }
+        }
+      }
+
+      // Leer por filas
+      let plain = "";
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          plain += matrix[r][c];
+        }
+      }
+
+      return { plain, rows, cols, matrix, order };
+    }
+
+    function renderMatrix(key, matrix, order) {
+      if (!key || matrix.length === 0) {
+        return "Introduce un mensaje y una clave para ver la matriz.";
+      }
+
+      const cols = key.length;
+      const header1 = [];
+      const header2 = [];
+
+      // Fila de letras de la clave
+      for (let c = 0; c < cols; c++) {
+        header1.push("  " + key[c] + " ");
+      }
+
+      // Fila de orden de columnas (posición en la lectura)
+      // order es un array con índices; invertimos para saber qué posición tiene cada columna
+      const posByCol = Array(cols).fill(0);
+      order.forEach((colIdx, pos) => {
+        posByCol[colIdx] = pos + 1; // pos empieza en 0
+      });
+
+      for (let c = 0; c < cols; c++) {
+        const num = String(posByCol[c]).padStart(2, " ");
+        header2.push(" " + num + " ");
+      }
+
+      let out = "";
+      out += "   CLAVE:  " + header1.join(" ") + "\n";
+      out += "   ORDEN:  " + header2.join(" ") + "\n";
+      out += "           " + "-".repeat(cols * 4) + "\n";
+
+      // Filas de texto
+      for (let r = 0; r < matrix.length; r++) {
+        let rowStr = String(r + 1).padStart(3, " ") + " | ";
+        for (let c = 0; c < cols; c++) {
+          rowStr += " " + (matrix[r][c] || "·") + "  ";
+        }
+        out += rowStr + "\n";
+      }
+
+      return out;
+    }
+
+    // ---------- DOM / UI ----------
+
+    const textInput   = document.getElementById("text-input");
+    const keyInput    = document.getElementById("key-input");
+    const btnRun      = document.getElementById("btn-run");
+    const normalizedDiv = document.getElementById("normalized");
+    const resultDiv   = document.getElementById("result");
+    const resultLabel = document.getElementById("result-label");
+    const matrixDiv   = document.getElementById("matrix");
+    const modeButtons = document.querySelectorAll(".mode-btn");
+
+    let currentMode = "encrypt";
+
+    modeButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        modeButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentMode = btn.getAttribute("data-mode") || "encrypt";
+        resultLabel.textContent = currentMode === "encrypt" ? "Cifrado" : "Descifrado";
+      });
+    });
+
+    btnRun.addEventListener("click", () => {
+      const rawText = textInput.value;
+      const rawKey  = keyInput.value;
+
+      const cleanText = normalizeText(rawText);
+      const cleanKey  = normalizeKey(rawKey);
+
+      if (!cleanKey) {
+        normalizedDiv.textContent = "";
+        resultDiv.textContent = "";
+        matrixDiv.textContent = "⚠ Escribe una clave válida (solo letras).";
+        return;
+      }
+
+      if (!cleanText) {
+        normalizedDiv.textContent = "";
+        resultDiv.textContent = "";
+        matrixDiv.textContent = "⚠ Escribe un mensaje para cifrar o descifrar.";
+        return;
+      }
+
+      normalizedDiv.textContent = cleanText;
+
+      if (currentMode === "encrypt") {
+        const { cipher, matrix, order } = encryptColumnar(cleanText, cleanKey);
+        resultDiv.textContent = cipher;
+        matrixDiv.textContent = renderMatrix(cleanKey, matrix, order);
+      } else {
+        const { plain, matrix, order } = decryptColumnar(cleanText, cleanKey);
+        resultDiv.textContent = plain;
+        matrixDiv.textContent = renderMatrix(cleanKey, matrix, order);
+      }
+    });
+
+    // ---------- Tema (dark / light) ----------
+    const html = document.documentElement;
+    const themeToggle = document.getElementById("theme-toggle");
+    const themeIcon = themeToggle.querySelector(".theme-toggle-icon");
+    const themeLabel = themeToggle.querySelector(".theme-toggle-label");
+    const THEME_KEY = "cryptolab-theme-columns";
+
+    function applyTheme(theme) {
+      html.setAttribute("data-theme", theme);
+      if (theme === "dark") {
+        themeIcon.textContent = "🌙";
+        themeLabel.textContent = "Modo oscuro";
+      } else {
+        themeIcon.textContent = "☀️";
+        themeLabel.textContent = "Modo claro";
+      }
+    }
+
+    const storedTheme = localStorage.getItem(THEME_KEY);
+    if (storedTheme === "dark" || storedTheme === "light") {
+      applyTheme(storedTheme);
+    } else {
+      applyTheme("dark");
+    }
+
+    themeToggle.addEventListener("click", () => {
+      const current = html.getAttribute("data-theme") === "dark" ? "dark" : "light";
+      const next = current === "dark" ? "light" : "dark";
+      applyTheme(next);
+      localStorage.setItem(THEME_KEY, next);
+    });
+
+    // Mensaje inicial en la matriz
+    matrixDiv.textContent = "Introduce un mensaje y una clave para ver cómo se construye la matriz de columnas.";
+  </script>
+</body>
+</html>
