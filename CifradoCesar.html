@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CryptoLab – Cifrado César</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg: #0b1020;
+      --bg-card: #111729;
+      --accent: #4fd1c5;
+      --accent-soft: rgba(79, 209, 197, 0.2);
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --danger: #f97373;
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1e293b 0, #020617 55%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .app {
+      width: 100%;
+      max-width: 1000px;
+      background: linear-gradient(135deg, rgba(79, 209, 197, 0.06), transparent);
+      border-radius: 24px;
+      padding: 1.8rem;
+      box-shadow: 0 25px 60px rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      backdrop-filter: blur(14px);
+    }
+    h1 {
+      font-size: 1.7rem;
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    h1 span.logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      border: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      color: var(--accent);
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 1.3rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 1.2rem;
+    }
+    @media (max-width: 800px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.7);
+    }
+    .card h2 {
+      font-size: 1.1rem;
+      margin-bottom: 0.35rem;
+    }
+    .card p {
+      font-size: 0.86rem;
+      color: var(--muted);
+      margin-bottom: 0.9rem;
+    }
+    label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 0.2rem;
+      display: block;
+    }
+    textarea {
+      width: 100%;
+      min-height: 110px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(15, 23, 42, 0.8);
+      color: var(--text);
+      padding: 0.6rem 0.7rem;
+      resize: vertical;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft);
+    }
+    .row {
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+      margin-top: 0.6rem;
+      margin-bottom: 0.5rem;
+      flex-wrap: wrap;
+    }
+    select, input[type="number"], input[type="range"] {
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      border-radius: 999px;
+      padding: 0.35rem 0.7rem;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    input[type="range"] {
+      width: 130px;
+      accent-color: var(--accent);
+    }
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 0.45rem 1.1rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      background: var(--accent);
+      color: #0f172a;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      box-shadow: 0 12px 30px rgba(79, 209, 197, 0.45);
+      transition: transform 0.07s ease, box-shadow 0.07s ease;
+    }
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 35px rgba(79, 209, 197, 0.6);
+    }
+    button:active {
+      transform: translateY(1px);
+      box-shadow: 0 7px 18px rgba(15, 23, 42, 0.9);
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.72rem;
+      padding: 0.25rem 0.55rem;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.12);
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+    .output {
+      margin-top: 0.5rem;
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.86rem;
+      background: #020617;
+      border-radius: 10px;
+      padding: 0.5rem 0.6rem;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      min-height: 70px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .shift-badge {
+      font-size: 0.78rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .results-list {
+      margin-top: 0.4rem;
+      max-height: 260px;
+      overflow-y: auto;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: rgba(15, 23, 42, 0.7);
+    }
+    .result-item {
+      padding: 0.45rem 0.55rem;
+      border-bottom: 1px solid rgba(30, 41, 59, 0.9);
+      font-family: "JetBrains Mono", ui-monospace, mono;
+      font-size: 0.8rem;
+    }
+    .result-item:last-child { border-bottom: none; }
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.2rem;
+    }
+    .result-text {
+      color: var(--text);
+    }
+    .hint {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.15rem;
+    }
+    .highlight {
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .footer {
+      margin-top: 1rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>
+      <span class="logo">CΣ</span>
+      CryptoLab – Cifrado César
+    </h1>
+    <p class="subtitle">
+      Juega con el cifrado clásico de César: cifra, descifra y prueba un ataque de fuerza bruta
+      para ver por qué estos métodos ya no son seguros.
+    </p>
+
+    <div class="grid">
+      <!-- Panel 1: Cifrar / Descifrar -->
+      <section class="card">
+        <div class="pill">Modo interactivo • Cifrado clásico</div>
+        <h2>1. Cifrar / Descifrar un mensaje</h2>
+        <p>
+          Escribe un mensaje, elige si quieres <span class="highlight">cifrar</span> o
+          <span class="highlight">descifrar</span> y ajusta el desplazamiento (0–25).
+          Solo se transforman las letras; números y símbolos se mantienen.
+        </p>
+
+        <label for="text-input">Mensaje</label>
+        <textarea id="text-input" placeholder="Ejemplo: EL EXAMEN ES EL VIERNES A LAS 9."></textarea>
+
+        <div class="row">
+          <div>
+            <label for="mode">Modo</label>
+            <select id="mode">
+              <option value="encrypt">Cifrar</option>
+              <option value="decrypt">Descifrar</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Desplazamiento</label>
+            <div class="row">
+              <input type="range" id="shift-range" min="0" max="25" value="3">
+              <input type="number" id="shift-number" min="0" max="25" value="3" style="width:60px;">
+              <span class="shift-badge">
+                <span>+3</span>
+              </span>
+            </div>
+          </div>
+
+          <div style="margin-top: 1.25rem;">
+            <button id="btn-apply">
+              ▶ Aplicar
+            </button>
+          </div>
+        </div>
+
+        <label>Resultado</label>
+        <div id="output" class="output"></div>
+        <p class="hint">
+          Actividad: que un alumno escriba un mensaje cifrado y otro tenga que descifrarlo
+          con el desplazamiento correcto.
+        </p>
+      </section>
+
+      <!-- Panel 2: Ataque de fuerza bruta -->
+      <section class="card">
+        <div class="pill">Criptoanálisis • Fuerza bruta</div>
+        <h2>2. Romper un César (fuerza bruta)</h2>
+        <p>
+          Pega aquí un texto cifrado con César. La app probará automáticamente los
+          26 desplazamientos y mostrará todos los posibles mensajes. Así ven por qué
+          este cifrado es inseguro con una máquina.
+        </p>
+
+        <label for="cipher-input">Texto cifrado</label>
+        <textarea id="cipher-input" placeholder="Ejemplo: HOHDPHQ H V HO YLHUPHV D ODV 9."></textarea>
+
+        <div class="row" style="justify-content: space-between;">
+          <button id="btn-bruteforce">🧨 Probar todos los desplazamientos</button>
+          <span style="font-size:0.8rem;color:var(--muted);">
+            Pista: busca la versión que “tenga sentido” en castellano.
+          </span>
+        </div>
+
+        <div id="results" class="results-list"></div>
+      </section>
+    </div>
+
+    <div class="footer">
+      <span>Actividad sugerida: por parejas, uno cifra un mensaje y el otro lo rompe con el panel de fuerza bruta.</span>
+      <span>Extensión: pedirles que comparen el número de intentos en papel vs. con la app.</span>
+    </div>
+  </div>
+
+  <script>
+    // Utilidad: normalizar a mayúsculas y limitar al alfabeto A-Z
+    const A_CODE = "A".charCodeAt(0);
+    const Z_CODE = "Z".charCodeAt(0);
+    const ALPHABET_SIZE = 26;
+
+    function shiftChar(char, shift, encrypt = true) {
+      const code = char.toUpperCase().charCodeAt(0);
+      if (code < A_CODE || code > Z_CODE) {
+        return char; // no es letra (espacio, número, símbolo...)
+      }
+      let offset = code - A_CODE;
+      let s = encrypt ? shift : -shift;
+      let newOffset = (offset + s + ALPHABET_SIZE) % ALPHABET_SIZE;
+      const shifted = String.fromCharCode(A_CODE + newOffset);
+      // Conserva minúsculas si el original era minúscula
+      return (char === char.toLowerCase()) ? shifted.toLowerCase() : shifted;
+    }
+
+    function caesar(text, shift, encrypt = true) {
+      return text
+        .split("")
+        .map(ch => shiftChar(ch, shift, encrypt))
+        .join("");
+    }
+
+    // Elementos UI
+    const textInput = document.getElementById("text-input");
+    const modeSelect = document.getElementById("mode");
+    const shiftRange = document.getElementById("shift-range");
+    const shiftNumber = document.getElementById("shift-number");
+    const shiftBadge = document.querySelector(".shift-badge span");
+    const output = document.getElementById("output");
+    const btnApply = document.getElementById("btn-apply");
+
+    const cipherInput = document.getElementById("cipher-input");
+    const btnBruteforce = document.getElementById("btn-bruteforce");
+    const resultsDiv = document.getElementById("results");
+
+    function syncShift(fromRange) {
+      const value = fromRange ? Number(shiftRange.value) : Number(shiftNumber.value);
+      shiftRange.value = value;
+      shiftNumber.value = value;
+      shiftBadge.textContent = "+" + value;
+    }
+
+    shiftRange.addEventListener("input", () => syncShift(true));
+    shiftNumber.addEventListener("input", () => {
+      let v = Number(shiftNumber.value);
+      if (Number.isNaN(v)) v = 0;
+      if (v < 0) v = 0;
+      if (v > 25) v = 25;
+      shiftNumber.value = v;
+      syncShift(false);
+    });
+
+    btnApply.addEventListener("click", () => {
+      const text = textInput.value || "";
+      const shift = Number(shiftRange.value);
+      const encrypt = modeSelect.value === "encrypt";
+      const result = caesar(text, shift, encrypt);
+      output.textContent = result || "⚠ No hay texto de entrada.";
+    });
+
+    btnBruteforce.addEventListener("click", () => {
+      const cipherText = cipherInput.value || "";
+      resultsDiv.innerHTML = "";
+      if (!cipherText.trim()) {
+        resultsDiv.innerHTML = "<div class='result-item' style='color:var(--danger);'>⚠ Escribe primero un texto cifrado.</div>";
+        return;
+      }
+
+      const fragment = document.createDocumentFragment();
+      for (let s = 0; s < ALPHABET_SIZE; s++) {
+        const candidate = caesar(cipherText, s, false);
+        const item = document.createElement("div");
+        item.className = "result-item";
+
+        const header = document.createElement("div");
+        header.className = "result-header";
+
+        const left = document.createElement("div");
+        left.innerHTML = `<span class="shift-badge">Desplazamiento ${s}</span>`;
+
+        const right = document.createElement("div");
+        right.style.fontSize = "0.72rem";
+        right.style.color = "var(--muted)";
+        right.textContent = "¿Tiene sentido?";
+
+        header.appendChild(left);
+        header.appendChild(right);
+
+        const textDiv = document.createElement("div");
+        textDiv.className = "result-text";
+        textDiv.textContent = candidate;
+
+        item.appendChild(header);
+        item.appendChild(textDiv);
+
+        fragment.appendChild(item);
+      }
+      resultsDiv.appendChild(fragment);
+    });
+
+    // Valor inicial coherente
+    syncShift(true);
+  </script>
+</body>
+</html>
