@@ -1,41 +1,106 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <title>CryptoLab – Cifrado César</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
+    /* Variables comunes */
     :root {
-      --bg: #0b1020;
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --radius-sm: 10px;
+
+      --font-main: system-ui, -apple-system, "Segoe UI", sans-serif;
+      --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    /* Tema oscuro */
+    :root[data-theme="dark"] {
+      --bg: radial-gradient(circle at top, #1e293b 0, #020617 55%);
       --bg-card: #111729;
+      --bg-card-soft: rgba(15, 23, 42, 0.8);
+
       --accent: #4fd1c5;
       --accent-soft: rgba(79, 209, 197, 0.2);
+
       --text: #e2e8f0;
       --muted: #94a3b8;
+      --border-soft: rgba(148, 163, 184, 0.25);
+      --border-strong: rgba(148, 163, 184, 0.4);
+
       --danger: #f97373;
-      --radius: 16px;
+      --output-bg: #020617;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* Tema claro */
+    :root[data-theme="light"] {
+      --bg: radial-gradient(circle at top, #e2e8f0 0, #ffffff 55%);
+      --bg-card: #ffffff;
+      --bg-card-soft: #f8fafc;
+
+      --accent: #2563eb;
+      --accent-soft: rgba(37, 99, 235, 0.16);
+
+      --text: #0f172a;
+      --muted: #64748b;
+      --border-soft: rgba(148, 163, 184, 0.4);
+      --border-strong: rgba(148, 163, 184, 0.7);
+
+      --danger: #e11d48;
+      --output-bg: #f1f5f9;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #1e293b 0, #020617 55%);
+      font-family: var(--font-main);
+      background: var(--bg);
       color: var(--text);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 1.5rem;
+      transition: background 0.4s ease, color 0.2s ease;
     }
+
     .app {
       width: 100%;
       max-width: 1000px;
-      background: linear-gradient(135deg, rgba(79, 209, 197, 0.06), transparent);
-      border-radius: 24px;
+      background: linear-gradient(135deg, var(--accent-soft), transparent);
+      border-radius: var(--radius-lg);
       padding: 1.8rem;
-      box-shadow: 0 25px 60px rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.25);
+      box-shadow: 0 25px 60px rgba(15, 23, 42, 0.35);
+      border: 1px solid var(--border-soft);
       backdrop-filter: blur(14px);
+      position: relative;
+      overflow: hidden;
     }
+
+    .app::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(148, 163, 184, 0.12), transparent 55%);
+      pointer-events: none;
+    }
+
+    header {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      z-index: 1;
+      margin-bottom: 1.2rem;
+    }
+
     h1 {
       font-size: 1.7rem;
       margin-bottom: 0.25rem;
@@ -43,6 +108,7 @@
       align-items: center;
       gap: 0.5rem;
     }
+
     h1 span.logo {
       width: 28px;
       height: 28px;
@@ -54,35 +120,79 @@
       font-size: 0.8rem;
       color: var(--accent);
     }
+
     .subtitle {
       color: var(--muted);
       font-size: 0.95rem;
-      margin-bottom: 1.3rem;
+      margin-bottom: 0.2rem;
     }
+
+    /* Botón de tema */
+    .theme-toggle {
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      background: var(--bg-card-soft);
+      color: var(--text);
+      font-size: 0.8rem;
+      padding: 0.3rem 0.75rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.2);
+      transition: background 0.15s ease, transform 0.08s ease, box-shadow 0.08s ease, border-color 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .theme-toggle:hover {
+      transform: translateY(-1px);
+      border-color: var(--accent);
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.28);
+    }
+
+    .theme-toggle:active {
+      transform: translateY(1px);
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.35);
+    }
+
+    .theme-toggle-icon {
+      font-size: 1rem;
+    }
+
     .grid {
+      position: relative;
+      z-index: 1;
       display: grid;
       grid-template-columns: 1.3fr 1fr;
       gap: 1.2rem;
+      margin-top: 0.4rem;
     }
+
     @media (max-width: 800px) {
       .grid { grid-template-columns: 1fr; }
+      header { flex-direction: column; align-items: flex-start; }
+      .theme-toggle { align-self: flex-end; }
     }
+
     .card {
       background: var(--bg-card);
-      border-radius: var(--radius);
+      border-radius: var(--radius-md);
       padding: 1rem 1.1rem;
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.25);
     }
+
     .card h2 {
       font-size: 1.1rem;
       margin-bottom: 0.35rem;
     }
+
     .card p {
       font-size: 0.86rem;
       color: var(--muted);
       margin-bottom: 0.9rem;
     }
+
     label {
       font-size: 0.8rem;
       text-transform: uppercase;
@@ -91,22 +201,29 @@
       margin-bottom: 0.2rem;
       display: block;
     }
+
     textarea {
       width: 100%;
       min-height: 110px;
-      border-radius: 10px;
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      background: rgba(15, 23, 42, 0.8);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-strong);
+      background: var(--bg-card-soft);
       color: var(--text);
       padding: 0.6rem 0.7rem;
       resize: vertical;
       font-size: 0.9rem;
       outline: none;
     }
+
+    textarea::placeholder {
+      color: var(--muted);
+    }
+
     textarea:focus {
       border-color: var(--accent);
       box-shadow: 0 0 0 1px var(--accent-soft);
     }
+
     .row {
       display: flex;
       gap: 0.6rem;
@@ -115,20 +232,23 @@
       margin-bottom: 0.5rem;
       flex-wrap: wrap;
     }
+
     select, input[type="number"], input[type="range"] {
-      background: rgba(15, 23, 42, 0.9);
+      background: var(--bg-card-soft);
       color: var(--text);
-      border: 1px solid rgba(148, 163, 184, 0.5);
+      border: 1px solid var(--border-strong);
       border-radius: 999px;
       padding: 0.35rem 0.7rem;
       font-size: 0.85rem;
       outline: none;
     }
+
     input[type="range"] {
       width: 130px;
       accent-color: var(--accent);
     }
-    button {
+
+    button.action {
       border-radius: 999px;
       border: none;
       padding: 0.45rem 1.1rem;
@@ -142,15 +262,19 @@
       gap: 0.4rem;
       box-shadow: 0 12px 30px rgba(79, 209, 197, 0.45);
       transition: transform 0.07s ease, box-shadow 0.07s ease;
+      white-space: nowrap;
     }
-    button:hover {
+
+    button.action:hover {
       transform: translateY(-1px);
       box-shadow: 0 16px 35px rgba(79, 209, 197, 0.6);
     }
-    button:active {
+
+    button.action:active {
       transform: translateY(1px);
       box-shadow: 0 7px 18px rgba(15, 23, 42, 0.9);
     }
+
     .pill {
       display: inline-flex;
       align-items: center;
@@ -162,18 +286,20 @@
       color: var(--muted);
       margin-bottom: 0.4rem;
     }
+
     .output {
       margin-top: 0.5rem;
-      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-family: var(--font-mono);
       font-size: 0.86rem;
-      background: #020617;
-      border-radius: 10px;
+      background: var(--output-bg);
+      border-radius: var(--radius-sm);
       padding: 0.5rem 0.6rem;
-      border: 1px solid rgba(148, 163, 184, 0.35);
+      border: 1px solid var(--border-strong);
       min-height: 70px;
       white-space: pre-wrap;
       word-wrap: break-word;
     }
+
     .shift-badge {
       font-size: 0.78rem;
       padding: 0.15rem 0.5rem;
@@ -184,39 +310,48 @@
       align-items: center;
       gap: 0.25rem;
     }
+
     .results-list {
       margin-top: 0.4rem;
       max-height: 260px;
       overflow-y: auto;
-      border-radius: 10px;
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      background: rgba(15, 23, 42, 0.7);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-soft);
+      background: var(--bg-card-soft);
     }
+
     .result-item {
       padding: 0.45rem 0.55rem;
-      border-bottom: 1px solid rgba(30, 41, 59, 0.9);
-      font-family: "JetBrains Mono", ui-monospace, mono;
+      border-bottom: 1px solid rgba(30, 41, 59, 0.4);
+      font-family: var(--font-mono);
       font-size: 0.8rem;
     }
+
     .result-item:last-child { border-bottom: none; }
+
     .result-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 0.2rem;
+      gap: 0.5rem;
     }
+
     .result-text {
       color: var(--text);
     }
+
     .hint {
       font-size: 0.75rem;
       color: var(--muted);
       margin-top: 0.15rem;
     }
+
     .highlight {
       color: var(--accent);
       font-weight: 600;
     }
+
     .footer {
       margin-top: 1rem;
       font-size: 0.78rem;
@@ -225,19 +360,30 @@
       justify-content: space-between;
       gap: 0.5rem;
       flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
     }
   </style>
 </head>
 <body>
   <div class="app">
-    <h1>
-      <span class="logo">CΣ</span>
-      CryptoLab – Cifrado César
-    </h1>
-    <p class="subtitle">
-      Juega con el cifrado clásico de César: cifra, descifra y prueba un ataque de fuerza bruta
-      para ver por qué estos métodos ya no son seguros.
-    </p>
+    <header>
+      <div>
+        <h1>
+          <span class="logo">CΣ</span>
+          CryptoLab – Cifrado César
+        </h1>
+        <p class="subtitle">
+          Juega con el cifrado clásico de César: cifra, descifra y prueba un ataque de fuerza
+          bruta para ver por qué estos métodos ya no son seguros.
+        </p>
+      </div>
+
+      <button id="theme-toggle" class="theme-toggle" type="button">
+        <span class="theme-toggle-icon">🌙</span>
+        <span class="theme-toggle-label">Modo oscuro</span>
+      </button>
+    </header>
 
     <div class="grid">
       <!-- Panel 1: Cifrar / Descifrar -->
@@ -274,7 +420,7 @@
           </div>
 
           <div style="margin-top: 1.25rem;">
-            <button id="btn-apply">
+            <button id="btn-apply" class="action" type="button">
               ▶ Aplicar
             </button>
           </div>
@@ -302,7 +448,9 @@
         <textarea id="cipher-input" placeholder="Ejemplo: HOHDPHQ H V HO YLHUPHV D ODV 9."></textarea>
 
         <div class="row" style="justify-content: space-between;">
-          <button id="btn-bruteforce">🧨 Probar todos los desplazamientos</button>
+          <button id="btn-bruteforce" class="action" type="button">
+            🧨 Probar todos los desplazamientos
+          </button>
           <span style="font-size:0.8rem;color:var(--muted);">
             Pista: busca la versión que “tenga sentido” en castellano.
           </span>
@@ -319,7 +467,6 @@
   </div>
 
   <script>
-    // Utilidad: normalizar a mayúsculas y limitar al alfabeto A-Z
     const A_CODE = "A".charCodeAt(0);
     const Z_CODE = "Z".charCodeAt(0);
     const ALPHABET_SIZE = 26;
@@ -327,13 +474,12 @@
     function shiftChar(char, shift, encrypt = true) {
       const code = char.toUpperCase().charCodeAt(0);
       if (code < A_CODE || code > Z_CODE) {
-        return char; // no es letra (espacio, número, símbolo...)
+        return char; // No es letra
       }
-      let offset = code - A_CODE;
-      let s = encrypt ? shift : -shift;
-      let newOffset = (offset + s + ALPHABET_SIZE) % ALPHABET_SIZE;
+      const offset = code - A_CODE;
+      const s = encrypt ? shift : -shift;
+      const newOffset = (offset + s + ALPHABET_SIZE) % ALPHABET_SIZE;
       const shifted = String.fromCharCode(A_CODE + newOffset);
-      // Conserva minúsculas si el original era minúscula
       return (char === char.toLowerCase()) ? shifted.toLowerCase() : shifted;
     }
 
@@ -344,35 +490,32 @@
         .join("");
     }
 
-    // Elementos UI
-    const textInput = document.getElementById("text-input");
-    const modeSelect = document.getElementById("mode");
-    const shiftRange = document.getElementById("shift-range");
+    // Elementos UI cifrado
+    const textInput   = document.getElementById("text-input");
+    const modeSelect  = document.getElementById("mode");
+    const shiftRange  = document.getElementById("shift-range");
     const shiftNumber = document.getElementById("shift-number");
-    const shiftBadge = document.querySelector(".shift-badge span");
-    const output = document.getElementById("output");
-    const btnApply = document.getElementById("btn-apply");
+    const shiftBadge  = document.querySelector(".shift-badge span");
+    const output      = document.getElementById("output");
+    const btnApply    = document.getElementById("btn-apply");
 
+    // Elementos UI fuerza bruta
     const cipherInput = document.getElementById("cipher-input");
     const btnBruteforce = document.getElementById("btn-bruteforce");
-    const resultsDiv = document.getElementById("results");
+    const resultsDiv  = document.getElementById("results");
 
     function syncShift(fromRange) {
-      const value = fromRange ? Number(shiftRange.value) : Number(shiftNumber.value);
+      let value = fromRange ? Number(shiftRange.value) : Number(shiftNumber.value);
+      if (Number.isNaN(value)) value = 0;
+      if (value < 0) value = 0;
+      if (value > 25) value = 25;
       shiftRange.value = value;
       shiftNumber.value = value;
       shiftBadge.textContent = "+" + value;
     }
 
     shiftRange.addEventListener("input", () => syncShift(true));
-    shiftNumber.addEventListener("input", () => {
-      let v = Number(shiftNumber.value);
-      if (Number.isNaN(v)) v = 0;
-      if (v < 0) v = 0;
-      if (v > 25) v = 25;
-      shiftNumber.value = v;
-      syncShift(false);
-    });
+    shiftNumber.addEventListener("input", () => syncShift(false));
 
     btnApply.addEventListener("click", () => {
       const text = textInput.value || "";
@@ -422,7 +565,41 @@
       resultsDiv.appendChild(fragment);
     });
 
-    // Valor inicial coherente
+    // --------- Tema (dark / light) ----------
+    const html = document.documentElement;
+    const themeToggle = document.getElementById("theme-toggle");
+    const themeIcon = themeToggle.querySelector(".theme-toggle-icon");
+    const themeLabel = themeToggle.querySelector(".theme-toggle-label");
+    const THEME_KEY = "cryptolab-theme";
+
+    function applyTheme(theme) {
+      html.setAttribute("data-theme", theme);
+      if (theme === "dark") {
+        themeIcon.textContent = "🌙";
+        themeLabel.textContent = "Modo oscuro";
+      } else {
+        themeIcon.textContent = "☀️";
+        themeLabel.textContent = "Modo claro";
+      }
+    }
+
+    // Leer preferencia previa
+    const storedTheme = localStorage.getItem(THEME_KEY);
+    if (storedTheme === "dark" || storedTheme === "light") {
+      applyTheme(storedTheme);
+    } else {
+      // Si no hay preferencia, dejamos "dark" por defecto
+      applyTheme("dark");
+    }
+
+    themeToggle.addEventListener("click", () => {
+      const current = html.getAttribute("data-theme") === "dark" ? "dark" : "light";
+      const next = current === "dark" ? "light" : "dark";
+      applyTheme(next);
+      localStorage.setItem(THEME_KEY, next);
+    });
+
+    // Inicializar coherentemente desplazamiento
     syncShift(true);
   </script>
 </body>
