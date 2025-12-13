@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Unidad 3 · Hash & Integrity Lab (SHA-256)</title>
+  <style>
+    :root{
+      --bg:#0b1020; --panel:#101a33; --panel2:#0f1730;
+      --text:#e7ecff; --muted:#a8b3da; --border:rgba(255,255,255,.10);
+      --accent:#7c5cff; --accent2:#2ee59d; --danger:#ff4d6d;
+      --shadow: 0 18px 50px rgba(0,0,0,.45);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
+    }
+    [data-theme="light"]{
+      --bg:#f6f7ff; --panel:#ffffff; --panel2:#f3f4ff;
+      --text:#11142a; --muted:#4f5b86; --border:rgba(15,20,42,.12);
+      --shadow: 0 18px 50px rgba(15,20,42,.12);
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:var(--sans);
+      background: radial-gradient(900px 500px at 18% 12%, rgba(124,92,255,.25), transparent 55%),
+                  radial-gradient(700px 450px at 85% 20%, rgba(46,229,157,.18), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      display:flex; align-items:center; justify-content:center;
+      padding:28px;
+    }
+    .app{
+      width:min(1120px, 100%);
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:18px;
+    }
+    header{
+      grid-column:1 / -1;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px;
+      padding:18px 18px 0;
+    }
+    .title{
+      display:flex; flex-direction:column; gap:2px;
+    }
+    .title h1{
+      margin:0; font-size:20px; letter-spacing:.2px;
+    }
+    .title p{
+      margin:0; color:var(--muted); font-size:13px;
+    }
+    .toggle{
+      display:flex; align-items:center; gap:10px;
+      padding:10px 12px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background: rgba(255,255,255,.04);
+      backdrop-filter: blur(6px);
+      box-shadow: var(--shadow);
+    }
+    .btn{
+      cursor:pointer;
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      transition: transform .08s ease, border-color .2s ease;
+      font-weight:600;
+    }
+    .btn:active{transform: scale(.98)}
+    .btn.primary{
+      border-color: rgba(124,92,255,.55);
+      box-shadow: 0 12px 40px rgba(124,92,255,.22);
+    }
+    .btn.good{
+      border-color: rgba(46,229,157,.55);
+      box-shadow: 0 12px 40px rgba(46,229,157,.18);
+    }
+    .btn.danger{
+      border-color: rgba(255,77,109,.55);
+      box-shadow: 0 12px 40px rgba(255,77,109,.16);
+    }
+
+    .card{
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border-radius:18px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:14px 16px;
+      border-bottom:1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px;
+    }
+    .card .hd h2{
+      margin:0; font-size:14px; letter-spacing:.2px;
+    }
+    .card .bd{
+      padding:16px;
+    }
+
+    textarea{
+      width:100%;
+      min-height:190px;
+      resize:vertical;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background: var(--panel2);
+      color:var(--text);
+      padding:12px 12px;
+      font-size:13px;
+      line-height:1.35;
+      outline:none;
+    }
+
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .row > *{flex: 0 0 auto}
+    .muted{color:var(--muted); font-size:12px}
+
+    .drop{
+      border:1px dashed rgba(124,92,255,.55);
+      background: rgba(124,92,255,.10);
+      padding:14px;
+      border-radius:14px;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+    }
+    .drop strong{font-size:13px}
+    .drop small{color:var(--muted)}
+
+    .hashbox{
+      font-family: var(--mono);
+      font-size: 12px;
+      word-break: break-all;
+      padding:12px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background: var(--panel2);
+      line-height:1.35;
+    }
+
+    .kpi{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      margin-top:12px;
+    }
+    .kpi .tile{
+      border:1px solid var(--border);
+      border-radius:16px;
+      background: rgba(255,255,255,.03);
+      padding:12px;
+    }
+    .kpi .tile .v{
+      font-size:18px;
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    .kpi .tile .l{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+    }
+
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:12px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      color:var(--text);
+    }
+    .dot{
+      width:10px; height:10px; border-radius:999px; background: var(--muted);
+    }
+    .dot.ok{background: var(--accent2)}
+    .dot.bad{background: var(--danger)}
+
+    .smallcode{
+      font-family: var(--mono);
+      font-size: 12px;
+      color:var(--muted);
+      background: rgba(255,255,255,.03);
+      border:1px solid var(--border);
+      padding:10px 12px;
+      border-radius:14px;
+      line-height:1.4;
+      white-space: pre-wrap;
+    }
+
+    @media (max-width: 980px){
+      .app{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+
+<body data-theme="dark">
+  <div class="app">
+    <header>
+      <div class="title">
+        <h1>Unidad 3 · Hash & Integrity Lab (SHA-256)</h1>
+        <p>Experimenta integridad, efecto avalancha y salting con WebCrypto (sin librerías).</p>
+      </div>
+      <div class="toggle">
+        <span class="muted">Tema</span>
+        <button class="btn" id="themeBtn" title="Cambiar dark/light">🌙 / ☀️</button>
+      </div>
+    </header>
+
+    <!-- IZQUIERDA -->
+    <section class="card">
+      <div class="hd">
+        <h2>Entrada: texto o archivo</h2>
+        <div class="row">
+          <button class="btn primary" id="hashBtn">Calcular SHA-256</button>
+          <button class="btn" id="mutateBtn">Mutar 1 carácter</button>
+          <button class="btn danger" id="resetBtn">Reset</button>
+        </div>
+      </div>
+
+      <div class="bd">
+        <div class="drop" id="dropZone">
+          <div>
+            <strong>Arrastra un archivo aquí</strong><br />
+            <small>o usa el botón “Cargar archivo”. La app hashea el contenido.</small>
+          </div>
+          <div class="row">
+            <input type="file" id="fileInput" hidden />
+            <button class="btn" id="fileBtn">Cargar archivo</button>
+          </div>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <label class="muted">Texto (si cargas archivo, aquí verás una vista previa parcial)</label>
+        <textarea id="inputText" spellcheck="false">Hola mundo. Cambia una letra y observa cómo cambia el hash.</textarea>
+
+        <div style="height:12px"></div>
+
+        <div class="row">
+          <label class="pill" title="Salting para contraseñas (concepto)">
+            <span class="dot" id="saltDot"></span>
+            <span>Usar salt</span>
+            <input type="checkbox" id="saltToggle" style="margin-left:6px; transform: translateY(1px);" />
+          </label>
+
+          <div style="flex:1 1 auto"></div>
+
+          <button class="btn good" id="storeBtn" title="Guarda el hash actual como referencia">
+            Guardar como “hash de referencia”
+          </button>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div class="muted">Salt actual (se genera al activar):</div>
+        <div class="smallcode" id="saltBox">—</div>
+      </div>
+    </section>
+
+    <!-- DERECHA -->
+    <aside class="card">
+      <div class="hd">
+        <h2>Salida: hash + comparación</h2>
+        <span class="pill" id="statusPill">
+          <span class="dot" id="statusDot"></span>
+          <span id="statusText">Sin referencia</span>
+        </span>
+      </div>
+      <div class="bd">
+        <div class="muted">Hash actual (SHA-256):</div>
+        <div class="hashbox" id="hashNow">—</div>
+
+        <div style="height:12px"></div>
+
+        <div class="muted">Hash de referencia (guardado):</div>
+        <div class="hashbox" id="hashRef">—</div>
+
+        <div class="kpi">
+          <div class="tile">
+            <div class="v" id="diffHex">—</div>
+            <div class="l">Diferencia (hex chars)</div>
+          </div>
+          <div class="tile">
+            <div class="v" id="diffBits">—</div>
+            <div class="l">Bits distintos (aprox.)</div>
+          </div>
+        </div>
+
+        <div style="height:14px"></div>
+
+        <div class="muted">Mini-explicación (para el alumno):</div>
+        <div class="smallcode">
+1) Calcula el hash del texto/archivo.
+2) Guarda el hash como referencia (integridad).
+3) Cambia 1 carácter (mutación) y vuelve a hashear.
+4) Observa el “efecto avalancha”: el hash cambia drásticamente.
+5) Activa “salt” para simular almacenamiento de contraseñas más seguro.
+        </div>
+      </div>
+    </aside>
+  </div>
+
+<script>
+  // ---------- Helpers ----------
+  const $ = (id) => document.getElementById(id);
+
+  function toHex(buffer){
+    const bytes = new Uint8Array(buffer);
+    let hex = "";
+    for (const b of bytes) hex += b.toString(16).padStart(2,"0");
+    return hex;
+  }
+
+  function randomSalt(len=16){
+    const a = new Uint8Array(len);
+    crypto.getRandomValues(a);
+    return Array.from(a).map(b => b.toString(16).padStart(2,"0")).join("");
+  }
+
+  async function sha256Hex(str){
+    const enc = new TextEncoder();
+    const data = enc.encode(str);
+    const hash = await crypto.subtle.digest("SHA-256", data);
+    return toHex(hash);
+  }
+
+  function diffHexChars(a,b){
+    if (!a || !b || a.length !== b.length) return null;
+    let diff=0;
+    for (let i=0;i<a.length;i++) if (a[i] !== b[i]) diff++;
+    return diff;
+  }
+
+  // aproximación: si difiere un hex char, en media cambian ~2 bits (no exacto).
+  function approxBitDiffFromHexCharDiff(d){ 
+    if (d == null) return null;
+    return Math.round(d * 2);
+  }
+
+  function setStatus(mode){
+    // mode: "none" | "ok" | "bad"
+    const dot = $("statusDot");
+    const txt = $("statusText");
+    dot.classList.remove("ok","bad");
+    if (mode === "none"){ txt.textContent = "Sin referencia"; dot.style.background = "var(--muted)"; return; }
+    if (mode === "ok"){ txt.textContent = "Integridad OK"; dot.classList.add("ok"); return; }
+    if (mode === "bad"){ txt.textContent = "Integridad FALLA"; dot.classList.add("bad"); return; }
+  }
+
+  // ---------- State ----------
+  let referenceHash = "";
+  let currentSalt = "";
+  let loadedFileName = "";
+  const input = $("inputText");
+
+  // ---------- Theme ----------
+  $("themeBtn").addEventListener("click", () => {
+    const body = document.body;
+    const isDark = body.getAttribute("data-theme") === "dark";
+    body.setAttribute("data-theme", isDark ? "light" : "dark");
+  });
+
+  // ---------- Salt toggle ----------
+  const saltToggle = $("saltToggle");
+  const saltBox = $("saltBox");
+  const saltDot = $("saltDot");
+
+  function refreshSaltUI(){
+    if (saltToggle.checked){
+      if (!currentSalt) currentSalt = randomSalt(16);
+      saltBox.textContent = currentSalt;
+      saltDot.classList.add("ok");
+    } else {
+      currentSalt = "";
+      saltBox.textContent = "—";
+      saltDot.classList.remove("ok");
+    }
+  }
+  saltToggle.addEventListener("change", async () => {
+    refreshSaltUI();
+    await compute(); // recalcula el hash con/sin salt
+  });
+  refreshSaltUI();
+
+  // ---------- File handling ----------
+  const dropZone = $("dropZone");
+  const fileInput = $("fileInput");
+  $("fileBtn").addEventListener("click", () => fileInput.click());
+
+  fileInput.addEventListener("change", async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await loadFile(file);
+  });
+
+  async function loadFile(file){
+    loadedFileName = file.name;
+    const buf = await file.arrayBuffer();
+    // Vista previa parcial si es muy grande
+    const bytes = new Uint8Array(buf);
+    const maxPreview = 12000; // 12 KB preview
+    const slice = bytes.slice(0, Math.min(bytes.length, maxPreview));
+    const previewText = new TextDecoder().decode(slice);
+
+    input.value = previewText + (bytes.length > maxPreview ? "\n\n[... vista previa parcial ...]" : "");
+    await compute(buf, file); // compute hash on raw bytes
+  }
+
+  // Drag & drop
+  ["dragenter","dragover"].forEach(ev=>{
+    dropZone.addEventListener(ev, (e)=>{ e.preventDefault(); dropZone.style.opacity = .95; });
+  });
+  ["dragleave","drop"].forEach(ev=>{
+    dropZone.addEventListener(ev, (e)=>{ e.preventDefault(); dropZone.style.opacity = 1; });
+  });
+  dropZone.addEventListener("drop", async (e)=>{
+    const file = e.dataTransfer.files?.[0];
+    if (file) await loadFile(file);
+  });
+
+  // ---------- Hash compute ----------
+  async function compute(rawBuffer=null, file=null){
+    try{
+      let hex = "";
+      if (rawBuffer && file){
+        // hash real del archivo (bytes), con salt opcional aplicado "conceptualmente"
+        // (para archivos, salt no es típico; lo mantenemos como experimento)
+        let bytes = new Uint8Array(rawBuffer);
+        if (saltToggle.checked && currentSalt){
+          const saltBytes = new TextEncoder().encode(currentSalt);
+          const merged = new Uint8Array(saltBytes.length + bytes.length);
+          merged.set(saltBytes,0);
+          merged.set(bytes,saltBytes.length);
+          bytes = merged;
+        }
+        const hash = await crypto.subtle.digest("SHA-256", bytes);
+        hex = toHex(hash);
+      } else {
+        // hash del texto
+        const data = saltToggle.checked && currentSalt
+          ? `${currentSalt}:${input.value}`
+          : input.value;
+        hex = await sha256Hex(data);
+      }
+
+      $("hashNow").textContent = hex;
+
+      // comparison
+      $("hashRef").textContent = referenceHash || "—";
+
+      if (!referenceHash){
+        setStatus("none");
+        $("diffHex").textContent = "—";
+        $("diffBits").textContent = "—";
+      } else {
+        const d = diffHexChars(referenceHash, hex);
+        $("diffHex").textContent = d + " / " + hex.length;
+        $("diffBits").textContent = approxBitDiffFromHexCharDiff(d) + " / ~256";
+        setStatus(referenceHash === hex ? "ok" : "bad");
+      }
+      return hex;
+    } catch(err){
+      $("hashNow").textContent = "Error: " + err.message;
+      setStatus("none");
+    }
+  }
+
+  $("hashBtn").addEventListener("click", async ()=> { await compute(); });
+
+  $("storeBtn").addEventListener("click", async ()=>{
+    const current = await compute();
+    if (!current) return;
+    referenceHash = current;
+    $("hashRef").textContent = referenceHash;
+    setStatus("ok");
+    // recompute to update diffs cleanly
+    await compute();
+  });
+
+  $("mutateBtn").addEventListener("click", async ()=>{
+    const s = input.value;
+    if (!s.length) return;
+    const i = Math.floor(Math.random() * s.length);
+    const ch = s[i];
+    const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,;:!?@#()[]{}+-*/=_ ";
+    let newCh = alphabet[Math.floor(Math.random()*alphabet.length)];
+    if (newCh === ch) newCh = alphabet[(alphabet.indexOf(newCh)+1) % alphabet.length];
+    input.value = s.slice(0,i) + newCh + s.slice(i+1);
+    await compute();
+  });
+
+  $("resetBtn").addEventListener("click", ()=>{
+    referenceHash = "";
+    loadedFileName = "";
+    input.value = "Hola mundo. Cambia una letra y observa cómo cambia el hash.";
+    $("hashNow").textContent = "—";
+    $("hashRef").textContent = "—";
+    $("diffHex").textContent = "—";
+    $("diffBits").textContent = "—";
+    setStatus("none");
+  });
+
+  // initial compute
+  compute();
+</script>
+</body>
+</html>
