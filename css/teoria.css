@@ -353,6 +353,10 @@ footer.app-footer{
    MODAL (DIALOG)
    ========================================================= */
 dialog.unit-modal{
+  position: fixed;              /* 🔑 */
+  inset: 0;                     /* 🔑 */
+  margin: auto;                 /* 🔑 */
+
   width: calc(100vw - 3rem);
   height: calc(100vh - 3rem);
   max-width: 1400px;
