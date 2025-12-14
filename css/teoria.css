@@ -374,17 +374,15 @@ h1{
 .empty-card p{ margin-top: .35rem; color: var(--muted); line-height: 1.45; }
 
 /* Footer */
-.app-footer{
-  border-top: 1px solid var(--border);
-  padding: 0.8rem 1.1rem;
-  color: var(--muted);
-  font-size: 0.82rem;
-  display:flex;
-  justify-content:space-between;
-  flex-wrap:wrap;
-  gap:0.4rem;
-  background: var(--card2);
+.app-footer a{
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--border2);
 }
+.app-footer a:hover{
+  border-bottom-color: var(--accent);
+}
+.footer-right{ display:flex; gap:.45rem; flex-wrap:wrap; justify-content:flex-end; }
 code{ font-family: var(--font-mono); }
 
 /* =======================
