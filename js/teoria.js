@@ -22,6 +22,9 @@
   const prevUnitBtn = document.getElementById("prevUnit");
   const nextUnitBtn = document.getElementById("nextUnit");
 
+  const y = document.getElementById("year");
+  if (y) y.textContent = new Date().getFullYear();
+
   // Theme/Print
   const html = document.documentElement;
   const themeBtn = document.getElementById("themeBtn");
@@ -372,7 +375,7 @@
 
   printBtn.addEventListener("click", () => window.print());
 
-  // ---------- Init ----------
+  // ----------  ----------
   setupCanvasBackground();
   renderUnits("");
   openFromHash();
