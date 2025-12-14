@@ -66,6 +66,25 @@ body{
   justify-content:center;
   overflow-x: hidden;
 }
+/* =======================
+   HEADER
+   ======================= */
+.header {
+  display: flex;
+  align-items: center;
+  padding: 16px 24px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo img {
+  height: 40px;
+  width: auto;
+}
 
 /* ===== Fondo HTML5 (canvas) ===== */
 .bg-canvas{
