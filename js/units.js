@@ -1,7 +1,7 @@
 // js/units.js
 // Solo datos. Añadir unidad = añadir un objeto aquí.
 
-const UNITS = [
+window.UNITS = [
   {
   id: "u1",
   number: 1,
