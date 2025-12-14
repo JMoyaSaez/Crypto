@@ -473,6 +473,27 @@ body.modal-open .app {
     </footer>
   </div>
 
+  <dialog id="unitModal" class="unit-modal" aria-label="Unidad">
+  <div class="modal-head">
+    <div>
+      <div class="modal-title">
+        <span class="badge" id="mBadge">Unidad</span>
+        <h2 id="mTitle">Título</h2>
+      </div>
+      <p class="modal-meta" id="mSummary"></p>
+    </div>
+
+    <button class="modal-close" id="mClose" type="button">
+      ✕ <span>Cerrar</span>
+    </button>
+  </div>
+
+  <div class="modal-body" id="mBody">
+    <!-- Contenido unidad por JS -->
+  </div>
+  </dialog>
+
+  
   <script>
     /*
       ✅ CÓMO AÑADIR UNA UNIDAD (sin tocar HTML):
@@ -838,25 +859,7 @@ if (location.hash) {
     document.getElementById("printBtn").addEventListener("click", () => window.print());
   </script>
 
-  <dialog id="unitModal" class="unit-modal" aria-label="Unidad">
-  <div class="modal-head">
-    <div>
-      <div class="modal-title">
-        <span class="badge" id="mBadge">Unidad</span>
-        <h2 id="mTitle">Título</h2>
-      </div>
-      <p class="modal-meta" id="mSummary"></p>
-    </div>
 
-    <button class="modal-close" id="mClose" type="button">
-      ✕ <span>Cerrar</span>
-    </button>
-  </div>
-
-  <div class="modal-body" id="mBody">
-    <!-- Contenido unidad por JS -->
-  </div>
-</dialog>
 
 </body>
 </html>
