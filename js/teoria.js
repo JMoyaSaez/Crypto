@@ -1,9 +1,7 @@
 // js/teoria.js
-// Requiere que UNITS exista (cargado desde js/units.js)
-
 (function () {
-  // ---------- Guardrails ----------
-  if (!Array.isArray(window.UNITS)) {
+  const UNITS = window.UNITS;
+  if (!Array.isArray(UNITS)) {
     console.error("UNITS no está definido. ¿Carga primero js/units.js?");
     return;
   }
@@ -81,6 +79,86 @@
     return `${figureHTML}${blocksHTML}${extrasHTML}`;
   }
 
+  // ---------- HTML5 Canvas background ----------
+  function setupCanvasBackground(){
+    const c = document.createElement("canvas");
+    c.className = "bg-canvas";
+    document.body.appendChild(c);
+
+    const ctx = c.getContext("2d");
+    let w = 0, h = 0, dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+
+    function resize(){
+      w = window.innerWidth;
+      h = window.innerHeight;
+      c.width = Math.floor(w * dpr);
+      c.height = Math.floor(h * dpr);
+      c.style.width = w + "px";
+      c.style.height = h + "px";
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    const n = Math.floor(Math.sqrt(w*h) / 22); // densidad suave
+    const pts = Array.from({length: Math.min(160, Math.max(70, n))}, () => ({
+      x: Math.random()*w,
+      y: Math.random()*h,
+      vx: (Math.random()*2-1)*0.18,
+      vy: (Math.random()*2-1)*0.18,
+      r: Math.random()*1.6 + 0.6
+    }));
+
+    const isLight = () => (document.documentElement.getAttribute("data-theme") === "light");
+
+    function tick(){
+      ctx.clearRect(0,0,w,h);
+
+      // color dinámico por tema
+      const dot = isLight() ? "rgba(15,23,42,0.25)" : "rgba(229,231,235,0.18)";
+      const line = isLight() ? "rgba(22,163,74,0.10)" : "rgba(34,197,94,0.10)";
+
+      // update
+      for (const p of pts){
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < -20) p.x = w+20;
+        if (p.x > w+20) p.x = -20;
+        if (p.y < -20) p.y = h+20;
+        if (p.y > h+20) p.y = -20;
+      }
+
+      // lines
+      ctx.strokeStyle = line;
+      for (let i=0;i<pts.length;i++){
+        for (let j=i+1;j<pts.length;j++){
+          const a=pts[i], b=pts[j];
+          const dx=a.x-b.x, dy=a.y-b.y;
+          const d2=dx*dx+dy*dy;
+          if (d2 < 140*140){
+            const alpha = 1 - (Math.sqrt(d2)/140);
+            ctx.globalAlpha = alpha;
+            ctx.beginPath();
+            ctx.moveTo(a.x,a.y);
+            ctx.lineTo(b.x,b.y);
+            ctx.stroke();
+          }
+        }
+      }
+      ctx.globalAlpha = 1;
+
+      // dots
+      ctx.fillStyle = dot;
+      for (const p of pts){
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fill();
+      }
+
+      requestAnimationFrame(tick);
+    }
+    tick();
+  }
+
   // ---------- Reveal on scroll ----------
   let revealObserver = null;
   function setupReveal(){
@@ -92,6 +170,36 @@
       });
     }, { threshold: 0.12 });
     els.forEach(el => revealObserver.observe(el));
+  }
+
+  // ---------- Tilt cards (sin librerías) ----------
+  function setupTilt(){
+    const cards = Array.from(document.querySelectorAll(".unit-card"));
+    const max = 7; // grados
+    cards.forEach(card => {
+      let raf = 0;
+      function onMove(e){
+        const r = card.getBoundingClientRect();
+        const cx = r.left + r.width/2;
+        const cy = r.top + r.height/2;
+        const dx = (e.clientX - cx) / (r.width/2);
+        const dy = (e.clientY - cy) / (r.height/2);
+        const rx = (-dy * max);
+        const ry = (dx * max);
+
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => {
+          card.style.transform = `translateY(-8px) perspective(900px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
+        });
+      }
+      function onLeave(){
+        cancelAnimationFrame(raf);
+        card.style.transform = "";
+      }
+
+      card.addEventListener("mousemove", onMove);
+      card.addEventListener("mouseleave", onLeave);
+    });
   }
 
   // ---------- Render cards ----------
@@ -124,20 +232,29 @@
       const titleShort = (u.title || "").replace(/^Unidad\s+\d+\s+—\s*/i, "");
       const chips = inferChips(u).slice(0, 3);
 
+      const heroStyle = (u.figure && u.figure.src)
+        ? `style="background-image:url('${esc(u.figure.src)}')"`
+        : "";
+
+      const heroClass = (u.figure && u.figure.src) ? "unit-hero has-img" : "unit-hero";
+
       a.innerHTML = `
-        <div class="unit-head">
-          <span class="badge">Unidad ${u.number}</span>
-          <span class="badge" style="opacity:.78;">Teoría</span>
+        <div class="${heroClass}" ${heroStyle}></div>
+        <div class="unit-body">
+          <div class="unit-head">
+            <span class="badge">Unidad ${u.number}</span>
+            <span class="badge" style="opacity:.78;">Teoría</span>
+          </div>
+
+          <div class="unit-title">${esc(titleShort)}</div>
+          <div class="unit-summary">${esc(u.summary || "")}</div>
+
+          <div class="unit-chips">
+            ${chips.map(c => `<span class="chip">${esc(c)}</span>`).join("")}
+          </div>
+
+          <div class="open-pill">Abrir <span style="opacity:.8;">↵</span></div>
         </div>
-
-        <div class="unit-title">${esc(titleShort)}</div>
-        <div class="unit-summary">${esc(u.summary || "")}</div>
-
-        <div class="unit-chips">
-          ${chips.map(c => `<span class="chip">${esc(c)}</span>`).join("")}
-        </div>
-
-        <div class="open-pill">Abrir <span style="opacity:.8;">↵</span></div>
       `;
 
       a.style.transitionDelay = `${Math.min(idx * 35, 220)}ms`;
@@ -147,6 +264,7 @@
     emptyState.hidden = filtered.length !== 0;
 
     setupReveal();
+    setupTilt();
   }
 
   // ---------- Modal navigation state ----------
@@ -180,7 +298,6 @@
 
   function closeUnitModal() {
     if (!modal.open) return;
-
     modal.classList.add("is-closing");
     setTimeout(() => {
       modal.close();
@@ -189,12 +306,8 @@
     }, 200);
   }
 
-  function openPrev(){
-    if (currentIndex > 0) openUnitModalById(UNITS[currentIndex - 1].id);
-  }
-  function openNext(){
-    if (currentIndex >= 0 && currentIndex < UNITS.length - 1) openUnitModalById(UNITS[currentIndex + 1].id);
-  }
+  function openPrev(){ if (currentIndex > 0) openUnitModalById(UNITS[currentIndex - 1].id); }
+  function openNext(){ if (currentIndex >= 0 && currentIndex < UNITS.length - 1) openUnitModalById(UNITS[currentIndex + 1].id); }
 
   // ---------- Events ----------
   unitList.addEventListener("click", (e) => {
@@ -205,11 +318,9 @@
   });
 
   mClose.addEventListener("click", closeUnitModal);
-
   prevUnitBtn.addEventListener("click", openPrev);
   nextUnitBtn.addEventListener("click", openNext);
 
-  // Cerrar click fuera
   modal.addEventListener("click", (e) => {
     const rect = modal.getBoundingClientRect();
     const outside =
@@ -218,21 +329,25 @@
     if (outside) closeUnitModal();
   });
 
-  // Teclado dentro modal
   window.addEventListener("keydown", (e) => {
+    // Atajo: "/" foco a búsqueda
+    if (e.key === "/" && document.activeElement !== q && !modal.open) {
+      e.preventDefault();
+      q.focus();
+      return;
+    }
     if (!modal.open) return;
+    if (e.key === "Escape") closeUnitModal();
     if (e.key === "ArrowLeft") openPrev();
     if (e.key === "ArrowRight") openNext();
   });
 
-  // Hash support
   function openFromHash() {
     const id = location.hash.replace("#", "");
     if (id && UNITS.some(u => u.id === id)) openUnitModalById(id);
   }
   window.addEventListener("hashchange", openFromHash);
 
-  // Search
   q.addEventListener("input", () => renderUnits(q.value));
   clearSearch.addEventListener("click", () => {
     q.value = "";
@@ -252,13 +367,13 @@
     const next = html.getAttribute("data-theme") === "dark" ? "light" : "dark";
     applyTheme(next);
     localStorage.setItem(THEME_KEY, next);
+    // el canvas cambia “solo” porque consulta el tema en cada frame
   });
 
-  // Print
   printBtn.addEventListener("click", () => window.print());
 
   // ---------- Init ----------
+  setupCanvasBackground();
   renderUnits("");
   openFromHash();
-
 })();
