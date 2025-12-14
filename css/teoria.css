@@ -353,24 +353,26 @@ footer.app-footer{
    MODAL (DIALOG)
    ========================================================= */
 dialog.unit-modal{
-  width:min(980px, calc(100vw - 2.2rem));
-  max-height:86vh;
-  border-radius:var(--r-lg);
-  border:1px solid var(--border);
-  background:var(--panel);
-  color:var(--text);
-  box-shadow:var(--shadow);
-  padding:0;
-  overflow:hidden;
+  width: calc(100vw - 3rem);
+  height: calc(100vh - 3rem);
+  max-width: 1400px;
 
-  opacity:0;
-  transform:translateY(16px) scale(.98);
-  transition:.18s ease;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  padding: 0;
+  overflow: hidden;
+
+  opacity: 0;
+  transform: translateY(20px) scale(0.98);
+  transition: opacity .2s ease, transform .2s ease;
 }
 
 dialog.unit-modal[open]{
-  opacity:1;
-  transform:none;
+  opacity: 1;
+  transform: none;
 }
 
 dialog.unit-modal::backdrop{
@@ -392,8 +394,9 @@ dialog.unit-modal.is-closing{
 }
 
 .modal-body{
-  padding:1rem 1.1rem;
-  overflow:auto;
+  padding: 1.2rem 1.4rem;
+  overflow-y: auto;
+  height: calc(100vh - 5.5rem); /* header + margen */
 }
 
 .modal-close{
