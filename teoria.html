@@ -6,7 +6,8 @@
   <title>Material de clase – Teoría (12 Unidades)</title>
   <meta name="description" content="Material de teoría por unidades. Navegación, buscador y modo oscuro/claro." />
 
-  <link rel="stylesheet" href="./css/teoria.css" />
+  <!-- Rutas relativas robustas (GitHub Pages) -->
+  <link rel="stylesheet" href="./css/teoria.css?v=3" />
 </head>
 
 <body>
@@ -28,6 +29,7 @@
           <button class="btn" id="themeBtn" type="button" title="Cambiar tema">
             <span id="themeIcon">🌙</span><span id="themeLabel">Oscuro</span>
           </button>
+
           <button class="btn" id="printBtn" type="button" title="Imprimir / Guardar PDF">
             🖨️ <span>Imprimir</span>
           </button>
@@ -42,10 +44,26 @@
           <input id="q" type="search" placeholder="Buscar en unidades…" aria-label="Buscar texto" />
         </div>
 
-        <div class="unitlist" id="unitList"></div>
+        <div class="unitlist" id="unitList">
+          <!-- JS renderiza aquí -->
+        </div>
       </nav>
 
-      <main id="content" tabindex="-1"></main>
+      <main id="content" tabindex="-1">
+        <noscript>
+          <article class="unit">
+            <header>
+              <div class="unit-title">
+                <span class="badge">JS desactivado</span>
+                <h2 style="font-size:1.1rem;">Activa JavaScript para ver el material</h2>
+              </div>
+            </header>
+            <p class="meta">
+              Esta web genera el índice y el contenido a partir de un array de unidades en <code>js/teoria.js</code>.
+            </p>
+          </article>
+        </noscript>
+      </main>
     </div>
 
     <footer class="app-footer">
@@ -54,7 +72,7 @@
     </footer>
   </div>
 
-  <!-- ✅ IMPORTANTE: el dialog ANTES del script -->
+  <!-- ✅ Modal central (debe existir antes de cargar el JS) -->
   <dialog id="unitModal" class="unit-modal" aria-label="Unidad">
     <div class="modal-head">
       <div>
@@ -65,14 +83,17 @@
         <p class="modal-meta" id="mSummary"></p>
       </div>
 
-      <button class="modal-close" id="mClose" type="button">
+      <button class="modal-close" id="mClose" type="button" aria-label="Cerrar unidad">
         ✕ <span>Cerrar</span>
       </button>
     </div>
 
-    <div class="modal-body" id="mBody"></div>
+    <div class="modal-body" id="mBody">
+      <!-- JS pinta aquí -->
+    </div>
   </dialog>
 
-  <script src="./js/teoria.js" defer></script>
+  <!-- JS al final + cache-busting -->
+  <script src="./js/teoria.js?v=3" defer></script>
 </body>
 </html>
