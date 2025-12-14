@@ -4,23 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Material de clase – Teoría (12 Unidades)</title>
-  <meta name="description" content="Material de teoría por unidades. Navegación, buscador y modo oscuro/claro." />
-
-  <!-- Rutas relativas robustas (GitHub Pages) -->
-  <link rel="stylesheet" href="./css/teoria.css?v=3" />
+  <meta name="description" content="Material de teoría por unidades. Navegación, buscador, cards animadas, y modo oscuro/claro." />
+  <link rel="stylesheet" href="./css/teoria.css?v=10" />
 </head>
 
 <body>
   <div class="app">
-    <header>
+    <header class="app-header">
       <div class="topbar">
         <div class="brand">
           <div class="logo">TH</div>
           <div>
-            <h1>Teoría – Material de clase (12 Unidades)</h1>
+            <h1>Teoría – Material de clase</h1>
             <p class="subtitle">
-              Navega por unidades, busca conceptos y amplía el temario añadiendo solo texto
-              en la configuración del archivo.
+              Unidades en formato cards. Click para abrir en ventana central (modo lectura).
             </p>
           </div>
         </div>
@@ -35,47 +32,42 @@
           </button>
         </div>
       </div>
+
+      <div class="toolbar">
+        <div class="search" role="search">
+          <span class="search-icn">⌕</span>
+          <input id="q" type="search" placeholder="Buscar por palabra clave (primos, Euclides, RSA…)" aria-label="Buscar texto" />
+          <button class="search-clear" id="clearSearch" type="button" title="Limpiar búsqueda">✕</button>
+        </div>
+      </div>
     </header>
 
-    <div class="layout">
-      <nav class="sidebar" aria-label="Índice de unidades">
-        <div class="search" role="search">
-          <span>⌕</span>
-          <input id="q" type="search" placeholder="Buscar en unidades…" aria-label="Buscar texto" />
+    <main class="app-main">
+      <section class="unitgrid-wrap">
+        <div class="unitgrid" id="unitList" aria-label="Listado de unidades">
+          <!-- JS renderiza cards aquí -->
         </div>
 
-        <div class="unitlist" id="unitList">
-          <!-- JS renderiza aquí -->
+        <div class="empty" id="emptyState" hidden>
+          <div class="empty-card">
+            <div class="badge">Sin resultados</div>
+            <h2>No encuentro nada con esa búsqueda</h2>
+            <p>Prueba con otra palabra (por ejemplo: “hash”, “RSA”, “módulo”, “clave”).</p>
+          </div>
         </div>
-      </nav>
-
-      <main id="content" tabindex="-1">
-        <noscript>
-          <article class="unit">
-            <header>
-              <div class="unit-title">
-                <span class="badge">JS desactivado</span>
-                <h2 style="font-size:1.1rem;">Activa JavaScript para ver el material</h2>
-              </div>
-            </header>
-            <p class="meta">
-              Esta web genera el índice y el contenido a partir de un array de unidades en <code>js/teoria.js</code>.
-            </p>
-          </article>
-        </noscript>
-      </main>
-    </div>
+      </section>
+    </main>
 
     <footer class="app-footer">
-      <span>✅ Añadir una unidad = añadir un objeto con texto en <code>UNITS</code>.</span>
-      <span>Tip: usa <strong>Ctrl+F</strong> o el buscador lateral para conceptos.</span>
+      <span>✅ Añadir una unidad = añadir un objeto en <code>js/units.js</code>.</span>
+      <span>Tip: abre una unidad y usa <strong>Ctrl+F</strong> dentro del modal.</span>
     </footer>
   </div>
 
-  <!-- ✅ Modal central (debe existir antes de cargar el JS) -->
+  <!-- Modal central -->
   <dialog id="unitModal" class="unit-modal" aria-label="Unidad">
     <div class="modal-head">
-      <div>
+      <div class="modal-head-left">
         <div class="modal-title">
           <span class="badge" id="mBadge">Unidad</span>
           <h2 id="mTitle">Título</h2>
@@ -83,17 +75,21 @@
         <p class="modal-meta" id="mSummary"></p>
       </div>
 
-      <button class="modal-close" id="mClose" type="button" aria-label="Cerrar unidad">
-        ✕ <span>Cerrar</span>
-      </button>
+      <div class="modal-head-right">
+        <button class="modal-nav" id="prevUnit" type="button" title="Unidad anterior">←</button>
+        <button class="modal-nav" id="nextUnit" type="button" title="Unidad siguiente">→</button>
+        <button class="modal-close" id="mClose" type="button" aria-label="Cerrar unidad">
+          ✕ <span>Cerrar</span>
+        </button>
+      </div>
     </div>
 
-    <div class="modal-body" id="mBody">
-      <!-- JS pinta aquí -->
-    </div>
+    <div class="modal-body" id="mBody"></div>
   </dialog>
 
-  <!-- JS al final + cache-busting -->
-  <script src="./js/teoria.js?v=3" defer></script>
+  <!-- Primero datos -->
+  <script src="./js/units.js?v=10" defer></script>
+  <!-- Luego lógica -->
+  <script src="./js/teoria.js?v=10" defer></script>
 </body>
 </html>
