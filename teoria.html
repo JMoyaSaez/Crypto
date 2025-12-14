@@ -319,6 +319,108 @@
       article.unit{ break-inside: avoid; }
       a{ color: #000; text-decoration:none; }
     }
+
+    /* ---------- Modal (HTML5 dialog) ---------- */
+dialog.unit-modal {
+  width: min(980px, calc(100vw - 2.2rem));
+  max-height: min(86vh, 900px);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--panel);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Backdrop */
+dialog.unit-modal::backdrop {
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+}
+
+/* Animación entrada/salida (aprovecha CSS3) */
+dialog.unit-modal {
+  opacity: 0;
+  transform: translateY(14px) scale(0.985);
+  transition: opacity .18s ease, transform .18s ease;
+}
+dialog.unit-modal[open] {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Cabecera modal */
+.modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding: 0.95rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, var(--accent2), transparent 60%);
+}
+
+.modal-title {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.modal-title h2 {
+  font-size: 1.15rem;
+  margin: 0;
+}
+.modal-meta {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+  line-height: 1.35;
+}
+
+/* Cuerpo modal */
+.modal-body {
+  padding: 1rem 1.05rem 1.2rem;
+  background: var(--panel);
+  overflow: auto;
+  max-height: calc(86vh - 72px);
+}
+
+/* Botón cerrar */
+.modal-close {
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  border-radius: var(--r-pill);
+  padding: 0.35rem 0.75rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+.modal-close:hover { border-color: var(--accent); transform: translateY(-1px); }
+.modal-close:active { transform: translateY(1px); }
+
+/* Botón "Abrir" dentro de cada tarjeta del índice */
+.open-pill {
+  margin-left: auto;
+  border-radius: var(--r-pill);
+  padding: 0.12rem 0.5rem;
+  border: 1px solid var(--border2);
+  background: var(--accent2);
+  color: var(--text);
+  font-size: 0.72rem;
+}
+
+/* Cuando modal está abierto, suavizamos el contenido de fondo */
+body.modal-open .app {
+  filter: blur(2px) saturate(0.95);
+  transform: scale(0.995);
+  transition: filter .18s ease, transform .18s ease;
+}
+
   </style>
 </head>
 
@@ -518,14 +620,23 @@ La factorización es única (salvo el orden de los factores).`
       });
 
       // Sidebar
-      unitList.innerHTML = "";
-      filtered.forEach(u => {
-        const a = document.createElement("a");
-        a.className = "unitlink";
-        a.href = `#${u.id}`;
-        a.innerHTML = `<strong>Unidad ${u.number}</strong><small>${esc(u.title.replace(/^Unidad\\s+\\d+\\s+—\\s*/i,""))}</small>`;
-        unitList.appendChild(a);
-      });
+      // Sidebar
+unitList.innerHTML = "";
+filtered.forEach(u => {
+  const a = document.createElement("a");
+  a.className = "unitlink";
+  a.href = `#${u.id}`; // sigue funcionando para accesibilidad
+  a.setAttribute("data-open-unit", u.id);
+
+  const titleShort = (u.title || "").replace(/^Unidad\s+\d+\s+—\s*/i, "");
+  a.innerHTML = `
+    <strong>Unidad ${u.number}</strong>
+    <small>${esc(titleShort)}</small>
+    <span class="open-pill">Abrir</span>
+  `;
+  unitList.appendChild(a);
+});
+
 
       // Content
       content.innerHTML = "";
@@ -622,8 +733,130 @@ La factorización es única (salvo el orden de los factores).`
       localStorage.setItem(THEME_KEY, next);
     });
 
+
+
+    // ---------- Modal open/close ----------
+const modal = document.getElementById("unitModal");
+const mBadge = document.getElementById("mBadge");
+const mTitle = document.getElementById("mTitle");
+const mSummary = document.getElementById("mSummary");
+const mBody = document.getElementById("mBody");
+const mClose = document.getElementById("mClose");
+
+function unitToHTML(u) {
+  let figureHTML = "";
+  if (u.figure && u.figure.src) {
+    figureHTML = `
+      <figure>
+        <img src="${esc(u.figure.src)}" alt="${esc(u.figure.alt||"Imagen de unidad")}" loading="lazy">
+        <figcaption>${esc(u.figure.caption||"")}</figcaption>
+      </figure>
+    `;
+  }
+
+  const blocksHTML = (u.blocks||[]).map(b => {
+    const pHTML = (b.p||[]).map(t => `<p>${esc(t)}</p>`).join("");
+    const ulHTML = b.ul?.length ? `<ul>${b.ul.map(li => `<li>${esc(li)}</li>`).join("")}</ul>` : "";
+    const olHTML = b.ol?.length ? `<ol>${b.ol.map(li => `<li>${esc(li)}</li>`).join("")}</ol>` : "";
+    const codeHTML = b.code ? `<pre><code>${esc(b.code)}</code></pre>` : "";
+    return `
+      <section class="block">
+        <h3>${esc(b.h3||"")}</h3>
+        ${pHTML}
+        ${ulHTML}
+        ${olHTML}
+        ${codeHTML}
+      </section>
+    `;
+  }).join("");
+
+  const extrasHTML = (u.extras||[]).map(ex => {
+    const exP = (ex.p||[]).map(t => `<p>${esc(t)}</p>`).join("");
+    return `
+      <details>
+        <summary>${esc(ex.title||"Notas")}</summary>
+        ${exP}
+      </details>
+    `;
+  }).join("");
+
+  return `${figureHTML}${blocksHTML}${extrasHTML}`;
+}
+
+function openUnitModal(unitId) {
+  const u = UNITS.find(x => x.id === unitId);
+  if (!u) return;
+
+  mBadge.textContent = `Unidad ${u.number}`;
+  mTitle.textContent = (u.title || "").replace(/^Unidad\s+\d+\s+—\s*/i, "");
+  mSummary.textContent = u.summary || "";
+  mBody.innerHTML = unitToHTML(u);
+
+  // abrir
+  document.body.classList.add("modal-open");
+  if (!modal.open) modal.showModal();
+  // foco accesible
+  mClose.focus();
+}
+
+function closeUnitModal() {
+  document.body.classList.remove("modal-open");
+  if (modal.open) modal.close();
+}
+
+// Click en índice → abrir modal
+unitList.addEventListener("click", (e) => {
+  const link = e.target.closest("[data-open-unit]");
+  if (!link) return;
+  e.preventDefault();
+  openUnitModal(link.getAttribute("data-open-unit"));
+});
+
+// Cerrar con botón
+mClose.addEventListener("click", closeUnitModal);
+
+// Cerrar haciendo click fuera (en backdrop)
+modal.addEventListener("click", (e) => {
+  const rect = modal.getBoundingClientRect();
+  const clickedOutside =
+    e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom;
+  if (clickedOutside) closeUnitModal();
+});
+
+// Soporte: si vienes con #u1 en la URL, abrir directo
+window.addEventListener("hashchange", () => {
+  const id = location.hash.replace("#", "");
+  if (id && UNITS.some(u => u.id === id)) openUnitModal(id);
+});
+if (location.hash) {
+  const id = location.hash.replace("#", "");
+  if (id && UNITS.some(u => u.id === id)) openUnitModal(id);
+}
+
+
     // ---------- Print ----------
     document.getElementById("printBtn").addEventListener("click", () => window.print());
   </script>
+
+  <dialog id="unitModal" class="unit-modal" aria-label="Unidad">
+  <div class="modal-head">
+    <div>
+      <div class="modal-title">
+        <span class="badge" id="mBadge">Unidad</span>
+        <h2 id="mTitle">Título</h2>
+      </div>
+      <p class="modal-meta" id="mSummary"></p>
+    </div>
+
+    <button class="modal-close" id="mClose" type="button">
+      ✕ <span>Cerrar</span>
+    </button>
+  </div>
+
+  <div class="modal-body" id="mBody">
+    <!-- Contenido unidad por JS -->
+  </div>
+</dialog>
+
 </body>
 </html>
