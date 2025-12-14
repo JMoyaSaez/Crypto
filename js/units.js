@@ -118,5 +118,130 @@ La factorización es única (salvo el orden de los factores).`
     }
   ]
 },
+//------------------------------------------------------------------------------------------------------------------------------
+//
+//
+//------------------------------------------------------------------------------------------------------------------------------
+{
+  id: "u2",
+  number: 2,
+  title: "Unidad 2 — Fundamentos de Criptografía",
+  summary:
+    "Evolución histórica (César, Vigenère, Enigma) hasta la criptografía moderna. Diferencias entre cifrados clásicos y modernos, y los pilares: confidencialidad, integridad y autenticación. Introducción a cifrado simétrico/asimétrico y su uso en seguridad digital.",
+  chips: ["Historia", "CIA + Auth", "Simétrico/Asimétrico"],
+
+  figure: {
+    src: "img/u2_portada.jpg",
+    alt: "Portada unidad 2: fundamentos de criptografía",
+    caption: "Unidad 2: de la criptografía clásica a la seguridad digital moderna."
+  },
+
+  blocks: [
+    {
+      h3: "2.1 Historia y evolución de la criptografía",
+      p: [
+        "La criptografía nace por la necesidad de ocultar mensajes y proteger comunicaciones. Evoluciona desde técnicas simples hasta sistemas matemáticos y estándares modernos.",
+        "En la Antigüedad aparece el cifrado de César (sustitución por desplazamiento). En la Edad Media se populariza el cifrado Vigenère (polialfabético) para resistir mejor ataques. En el siglo XX, las máquinas electromecánicas como Enigma marcan un salto enorme: combinaciones masivas, pero también el nacimiento del criptoanálisis moderno."
+      ],
+      ul: [
+        "César: sustitución simple → vulnerable a análisis de frecuencia.",
+        "Vigenère: clave + sustitución variable → más resistente que César.",
+        "Enigma: rotores + permutaciones → auge de criptoanálisis (Bletchley Park)."
+      ]
+    },
+
+    {
+      h3: "2.2 Criptografía clásica vs criptografía moderna",
+      p: [
+        "Los cifrados clásicos suelen basarse en reglas “lingüísticas” (sustitución/transposición) y se rompen con estadística y pruebas sistemáticas. La criptografía moderna se apoya en matemáticas, algoritmos estandarizados y modelos de amenaza.",
+        "Con la era digital surgen estándares como DES en los años 70 y posteriormente AES en los 2000, consolidados como cifrado simétrico. En paralelo, la criptografía asimétrica (clave pública/privada) aparece en los 70 y cambia el paradigma: permite comunicación segura sin compartir previamente una clave secreta."
+      ],
+      ul: [
+        "Clásica: fácil de implementar, poca seguridad frente a ataques modernos.",
+        "Moderna: algoritmos públicos, seguridad basada en claves y problemas difíciles.",
+        "Estándares: DES → AES (simétrico); clave pública para intercambio y firmas."
+      ]
+    },
+
+    {
+      h3: "2.3 Principios de seguridad: confidencialidad, integridad y autenticación",
+      p: [
+        "La criptografía moderna persigue tres objetivos: confidencialidad (solo acceden los autorizados), integridad (detectar alteraciones) y autenticación (verificar identidad). En sistemas reales trabajan juntos.",
+        "Por ejemplo, confidencialidad sin integridad permitiría modificar datos cifrados sin que nadie lo detecte. Integridad sin autenticación puede permitir que un atacante altere información ‘como si’ fuera el emisor legítimo. Por eso se combinan cifrado, hashes/MAC, firmas y certificados."
+      ],
+      ul: [
+        "Confidencialidad: cifrado (simétrico/asimétrico).",
+        "Integridad: hashes, MAC, firmas digitales.",
+        "Autenticación: contraseñas, 2FA, biometría, certificados y PKI."
+      ]
+    },
+
+    {
+      h3: "2.4 Autenticación: métodos y firma digital",
+      p: [
+        "La autenticación valida identidades antes de conceder acceso. Puede basarse en ‘algo que sabes’ (contraseña/PIN), ‘algo que tienes’ (2FA con móvil/token) o ‘algo que eres’ (biometría).",
+        "En entornos profesionales, los certificados digitales (emitidos por una CA) enlazan una identidad con una clave pública. Las firmas digitales usan criptografía asimétrica para asegurar que un mensaje proviene del emisor y no ha sido alterado."
+      ],
+      ul: [
+        "Contraseñas/PIN: simples pero vulnerables (reutilización, phishing).",
+        "2FA: reduce riesgo si la contraseña se filtra.",
+        "Certificados/CA: base de confianza en Internet (identidad ↔ clave pública).",
+        "Firma digital: integridad + autenticidad del mensaje/documento."
+      ]
+    },
+
+    {
+      h3: "2.5 Cifrado simétrico vs asimétrico (cuándo usar cada uno)",
+      p: [
+        "En cifrado simétrico se usa la misma clave para cifrar/descifrar: es rápido y eficiente, ideal para grandes volúmenes (por ejemplo, cifrar ficheros o tráfico una vez establecida la sesión). Su reto es el intercambio seguro de claves.",
+        "En cifrado asimétrico hay par de claves (pública/privada): resuelve el intercambio inicial y permite firmas digitales, pero es más costoso computacionalmente. En la práctica se combinan: asimétrico para acordar la clave, simétrico para cifrar datos."
+      ],
+      ul: [
+        "Simétrico: muy rápido, pero requiere compartir clave secreta.",
+        "Asimétrico: facilita intercambio y firmas, pero más lento.",
+        "Uso real: híbrido (TLS/HTTPS: handshake asimétrico + datos simétricos)."
+      ]
+    },
+
+    {
+      h3: "2.6 Mini-ejemplos rápidos (para clase y práctica)",
+      p: [
+        "Los ejemplos pequeños ayudan a entender el ‘por qué’ de la evolución. Un cifrado simple puede ser didáctico, pero inseguro en producción. En cambio, los cifrados modernos están diseñados para resistir ataques conocidos.",
+        "En esta unidad se recomienda practicar cifrados clásicos, simular ataques (frecuencia/bruteforce) y luego comparar con herramientas modernas para ver por qué hoy usamos estándares."
+      ],
+      code:
+`César (desplazamiento k=3):
+TEXTO:  HOLA
+CIFRA:  KROD  (H→K, O→R, L→O, A→D)
+
+Idea clave:
+- Fácil cifrar/descifrar
+- Fácil romper con fuerza bruta (25 opciones) y frecuencia`
+    }
+  ],
+
+  extras: [
+    {
+      title: "Resultados de aprendizaje (qué deberían dominar)",
+      p: [
+        "Describir la evolución histórica de la criptografía y cómo cambian los métodos con la tecnología.",
+        "Diferenciar cifrados clásicos y modernos, identificando ventajas/limitaciones actuales.",
+        "Explicar confidencialidad, integridad y autenticación y su implementación práctica.",
+        "Aplicar conceptos básicos de cifrado simétrico y asimétrico en escenarios sencillos."
+      ]
+    },
+    {
+      title: "Idea de práctica para enlazar con tu web (HTML5)",
+      p: [
+        "Actividad sugerida: ‘Rompe el cifrado’. La app permite cifrar con César/Vigenère y luego atacar (frecuencia/bruteforce) para ver debilidades. Después, comparan con un cifrado moderno (demo conceptual) y redactan conclusiones."
+      ]
+    }
+  ]
+},
+
+//------------------------------------------------------------------------------------------------------------------------------
+//
+//
+//------------------------------------------------------------------------------------------------------------------------------
 ];
 
