@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Modular Lab — Crypto Engine</title>
+
+<style>
+
+body {
+    background: #0d1117;
+    color: #00ff99;
+    font-family: "Courier New", monospace;
+    margin: 0;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 40px;
+}
+
+h1 {
+    text-align: center;
+    color: #00ffcc;
+}
+
+.subtitle {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #66ffcc;
+}
+
+.card {
+    background: #161b22;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0,255,150,0.1);
+}
+
+label {
+    display: block;
+    margin-top: 10px;
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    background: #0d1117;
+    border: 1px solid #00ff99;
+    color: #00ff99;
+}
+
+button {
+    margin-top: 15px;
+    padding: 10px;
+    width: 100%;
+    background: #00ff99;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    background: #00cc77;
+}
+
+.output {
+    height: 350px;
+    overflow-y: auto;
+}
+
+pre {
+    white-space: pre-wrap;
+}
+
+.result-box {
+    margin-top: 15px;
+    padding: 10px;
+    background: #0d1117;
+    border: 1px solid #00ff99;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🔐 Modular Lab</h1>
+<p class="subtitle">Comparación de Exponenciación Modular</p>
+
+<div class="card">
+
+<label>Base</label>
+<input type="number" id="base" value="3">
+
+<label>Exponente</label>
+<input type="number" id="exponent" value="50">
+
+<label>Módulo</label>
+<input type="number" id="modulus" value="7">
+
+<button onclick="calculate()">Calcular</button>
+
+</div>
+
+<div class="card">
+<h2>Resultados</h2>
+<div class="result-box" id="summary"></div>
+</div>
+
+<div class="card output">
+<h2>Proceso Paso a Paso</h2>
+<pre id="log"></pre>
+</div>
+
+</div>
+
+<script>
+
+function calculate() {
+
+    const base = BigInt(document.getElementById("base").value);
+    const exponent = BigInt(document.getElementById("exponent").value);
+    const modulus = BigInt(document.getElementById("modulus").value);
+
+    const log = document.getElementById("log");
+    const summary = document.getElementById("summary");
+
+    log.textContent = "";
+    summary.innerHTML = "";
+
+    if (modulus === 0n) {
+        logMessage("Error: El módulo no puede ser 0");
+        return;
+    }
+
+    // -------- MÉTODO RÁPIDO --------
+    let startFast = performance.now();
+
+    let resultFast = 1n;
+    let b = base % modulus;
+    let e = exponent;
+    let operationsFast = 0;
+
+    logMessage("=== MÉTODO RÁPIDO (Square & Multiply) ===");
+    logMessage(`Base reducida: ${b}`);
+    logMessage(`Exponente en binario: ${e.toString(2)}`);
+    logMessage("----------------------------------");
+
+    while (e > 0n) {
+
+        if (e % 2n === 1n) {
+            resultFast = (resultFast * b) % modulus;
+            operationsFast++;
+            logMessage(`Multiplico → resultado = ${resultFast}`);
+        }
+
+        b = (b * b) % modulus;
+        operationsFast++;
+        logMessage(`Cuadrado → base = ${b}`);
+
+        e = e / 2n;
+    }
+
+    let endFast = performance.now();
+    let timeFast = (endFast - startFast).toFixed(4);
+
+
+    // -------- MÉTODO LENTO --------
+    let startSlow = performance.now();
+
+    let resultSlow = 1n;
+    let operationsSlow = 0;
+
+    logMessage("");
+    logMessage("=== MÉTODO LENTO (Naive) ===");
+    logMessage("----------------------------------");
+
+    for (let i = 0n; i < exponent; i++) {
+        resultSlow = (resultSlow * base) % modulus;
+        operationsSlow++;
+        if (i < 10n) {
+            logMessage(`Paso ${i+1n} → ${resultSlow}`);
+        }
+    }
+
+    let endSlow = performance.now();
+    let timeSlow = (endSlow - startSlow).toFixed(4);
+
+    logMessage("");
+    logMessage("====================================");
+
+    summary.innerHTML = `
+    <b>Resultado:</b> ${resultFast}<br><br>
+    <b>Método rápido:</b><br>
+    Operaciones: ${operationsFast}<br>
+    Tiempo: ${timeFast} ms<br><br>
+    <b>Método lento:</b><br>
+    Operaciones: ${operationsSlow}<br>
+    Tiempo: ${timeSlow} ms<br><br>
+    <b>Reducción de complejidad:</b> ${operationsSlow / operationsFast} veces menos operaciones
+    `;
+}
+
+function logMessage(message) {
+    const log = document.getElementById("log");
+    log.textContent += message + "\n";
+}
+
+</script>
+
+</body>
+</html>
