@@ -238,6 +238,167 @@ Idea clave:
     }
   ]
 },
+//------------------------------------------------------------------------------------------------------------------------------
+//
+// Unidad 3 — Funciones Hash y Cifrado Simétrico (SHA-2 / AES) + uso real (integridad, autenticación y fallos típicos)
+//
+//------------------------------------------------------------------------------------------------------------------------------
+{
+  id: "u3",
+  number: 3,
+  title: "Unidad 3 — Hash (SHA-2) y Cifrado Simétrico (AES)",
+  summary:
+    "Funciones hash como huella digital (salida fija), propiedades (determinismo, avalancha, colisiones/preimagen) y usos reales: integridad, verificación, forense, deduplicación, blockchain. Segunda parte: cifrado simétrico (DES/3DES/AES), modos de operación (ECB/CBC/CTR/GCM), IV/nonce y AEAD. Enfoque realista: la cripto fuerte no compensa mala ingeniería (nonces repetidos, claves filtradas, endpoints).",
+  chips: ["Hash", "SHA-2", "AES", "Modos", "AEAD", "Realismo"],
+
+  figure: {
+    src: "img/u3_portada.jpg",
+    alt: "Portada unidad 3: hash y cifrado simétrico",
+    caption: "Unidad 3: integridad (hash) + confidencialidad (AES) + uso correcto en sistemas reales."
+  },
+
+  blocks: [
+    {
+      h3: "3.1 Hash: qué es y por qué importa (huella digital)",
+      p: [
+        "Una función hash transforma cualquier entrada (texto/archivo/firmware) en una salida de tamaño fijo (digest). No cifra: no oculta contenido; permite identificarlo y detectar cambios.",
+        "La salida fija hace que sea ideal para comparar rápido, indexar en BBDD, deduplicar y verificar descargas. Si el archivo cambia, el digest cambia de forma drástica."
+      ],
+      ul: [
+        "Salida fija: SHA-256 → 256 bits siempre.",
+        "Uso típico: verificación de integridad (descargas, firmware, backups).",
+        "Hash ≠ mini-copia: no permite reconstruir el archivo."
+      ]
+    },
+
+    {
+      h3: "3.2 Propiedades criptográficas (determinismo, avalancha, resistencias)",
+      p: [
+        "Para que un hash sea útil en seguridad debe ser determinista (mismo input → mismo digest), mostrar efecto avalancha (cambio mínimo → digest totalmente distinto) y resistir ataques clave.",
+        "Resistencias: preimagen (dado H, encontrar M), segunda preimagen (dado M1, hallar M2), y colisiones (dos entradas distintas con mismo digest)."
+      ],
+      ul: [
+        "Determinismo: base de la verificación.",
+        "Avalancha: detecta alteraciones con 1 bit de diferencia.",
+        "Colisiones/preimagen: marcan qué usos son seguros (firmas, integridad adversarial)."
+      ]
+    },
+
+    {
+      h3: "3.3 Algoritmos hash: MD5, SHA-1, SHA-256 (SHA-2) y SHA-3",
+      p: [
+        "No todos los hashes sirven para seguridad moderna. MD5 y SHA-1 se consideran obsoletos para escenarios adversarios por colisiones prácticas o debilidades conocidas.",
+        "SHA-256 (SHA-2) es el estándar práctico actual para integridad. SHA-3 aporta una familia alternativa con diseño distinto (diversidad criptográfica)."
+      ],
+      ul: [
+        "Evitar: MD5 / SHA-1 en integridad bajo ataque y firmas.",
+        "Usar: SHA-256 (verificación, integridad) / SHA-3 como alternativa robusta.",
+        "Idea clave: elegir algoritmo según amenaza, no por costumbre."
+      ]
+    },
+
+    {
+      h3: "3.4 Contraseñas: por qué un hash rápido no basta (salt + KDF + coste)",
+      p: [
+        "Guardar contraseñas en texto plano es crítico. Guardarlas como hash ayuda, pero si el hash es rápido (SHA-256 sin más), un atacante puede probar millones de intentos por segundo (diccionario/fuerza bruta).",
+        "Defensas: salt (rompe reutilización y rainbow tables) + KDF (encarece cada intento) + coste/memoria (dificulta ataques masivos)."
+      ],
+      ul: [
+        "Ataques reales: diccionario, fuerza bruta, tablas arcoíris.",
+        "Salt por usuario: hashes distintos aunque la contraseña sea igual.",
+        "KDF/coste: cada intento se vuelve caro → defensa práctica."
+      ]
+    },
+
+    {
+      h3: "3.5 Integridad autenticada: MAC/HMAC y el límite del hash ‘solo’",
+      p: [
+        "Un hash por sí solo no demuestra quién envió el mensaje: si un atacante puede modificar mensaje y hash, te engaña igual.",
+        "HMAC (hash + clave secreta) aporta integridad + autenticidad entre dos partes que comparten clave. Para identidad pública: firmas digitales."
+      ],
+      ul: [
+        "Hash solo: integridad si el ‘hash de referencia’ es confiable.",
+        "HMAC: el atacante no puede recalcular sin la clave.",
+        "Regla mental: integridad ≠ autenticidad."
+      ]
+    },
+
+    {
+      h3: "3.6 Cifrado simétrico: DES/3DES y salto a AES",
+      p: [
+        "El cifrado simétrico protege confidencialidad usando la misma clave para cifrar/descifrar. DES fue histórico pero hoy es vulnerable (clave corta). 3DES fue un parche, pero es lento y con bloque pequeño.",
+        "AES es el estándar moderno: rápido, robusto, soporte amplio, claves 128/192/256 y bloque de 128 bits."
+      ],
+      ul: [
+        "DES: obsoleto por fuerza bruta (clave corta).",
+        "3DES: compatibilidad histórica, hoy en retirada.",
+        "AES: estándar moderno en la práctica."
+      ]
+    },
+
+    {
+      h3: "3.7 Modos de operación: ECB, CBC, CTR, GCM (AEAD) y IV/nonce",
+      p: [
+        "AES cifra bloques; para mensajes reales se usan modos. ECB filtra patrones (malo). CBC evita patrones pero requiere IV correcto y no da integridad por sí solo. CTR es rápido, pero no se puede repetir nonce con la misma clave.",
+        "GCM (AEAD) integra cifrado + autenticación (tag). En sistemas modernos, AEAD es la opción preferida para evitar manipulación."
+      ],
+      ul: [
+        "ECB: no usar en datos reales.",
+        "CBC/CTR: seguros si se usan bien (IV/nonce correctos) y con autenticación.",
+        "GCM (AEAD): estándar moderno (confidencialidad + integridad)."
+      ]
+    },
+
+    {
+      h3: "3.8 Realismo de seguridad: no se rompe AES, se rompe el sistema alrededor",
+      p: [
+        "Romper SHA-256 o AES-256 por fuerza bruta no es realista hoy. Los incidentes ocurren por fallos de ingeniería: contraseñas débiles, nonces repetidos, claves filtradas, endpoints comprometidos, ingeniería social.",
+        "‘Seguro’ no significa invulnerable: significa que, implementado correctamente, el coste del ataque es demasiado alto."
+      ],
+      ul: [
+        "Errores típicos: nonce reuse, claves hardcodeadas, logs con secretos.",
+        "Buenas prácticas: AEAD, rotación de claves, controles de acceso y auditoría.",
+        "Mentalidad: modelo de amenaza + implementación correcta."
+      ]
+    },
+
+    {
+      h3: "3.9 Mini-ejemplos rápidos (para clase y práctica)",
+      p: [
+        "Ejemplos guiados para fijar ideas: determinismo/avalancha con SHA-256, verificación de firmware OT con hash oficial, y demostración de por qué ECB filtra patrones.",
+        "Objetivo: que el alumno elija herramienta correcta (hash/cifrado/HMAC) según el problema (integridad, confidencialidad, autenticidad)."
+      ],
+      code:
+`Ejemplo conceptual (no cálculos):
+- Mismo archivo → mismo SHA-256 (determinismo)
+- Cambiar 1 byte → SHA-256 cambia por completo (avalancha)
+
+Checklist operativo (firmware):
+hash oficial + cálculo local + comparación
+
+Regla de oro (CTR/GCM):
+NO repetir nonce con la misma clave`
+    }
+  ],
+
+  extras: [
+    {
+      title: "Resultados de aprendizaje (qué deberían dominar)",
+      p: [
+        "Explicar qué es un hash, sus propiedades y sus usos reales (integridad, verificación, forense, deduplicación, blockchain).",
+        "Diferenciar colisiones, preimagen y ataques a contraseñas (diccionario/fuerza bruta) y justificar defensas (salt + KDF).",
+        "Explicar cifrado simétrico (DES/3DES/AES) y seleccionar modos seguros (CBC/CTR/GCM) entendiendo IV/nonce y AEAD.",
+        "Aplicar criterio realista: la cripto fuerte exige buena implementación y gestión de claves."
+      ]
+    },
+    {
+      title: "Idea de práctica para enlazar con tu web (HTML5)",
+      p: [
+        "Actividad sugerida: ‘Integrity Lab’. La app permite: (1) calcular SHA-256 de archivos/textos y comprobar determinismo/avalancha, (2) simular verificación de firmware con hash oficial, (3) demo visual ECB vs CBC/CTR, (4) mini-simulador de ‘nonce reuse’ (por qué rompe CTR/GCM). Los alumnos entregan conclusiones y checklist de buenas prácticas."
+      ]
+    }
+  ]
+},
 
 //------------------------------------------------------------------------------------------------------------------------------
 //
