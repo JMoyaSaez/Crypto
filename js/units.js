@@ -599,6 +599,156 @@ openssl x509 -in server.crt -noout -text`
     }
   ]
 },
+//------------------------------------------------------------------------------------------------------------------------------
+//
+// Unidad 5 — Introducción a Blockchain
+//
+//------------------------------------------------------------------------------------------------------------------------------
+{
+  id: "u5",
+  number: 5,
+  title: "Unidad 5 — Introducción a Blockchain",
+  summary:
+    "Qué es blockchain (DLT) y por qué surge: confianza sin intermediarios, transparencia, inmutabilidad y seguridad. Fundamentos matemáticos (hash, firmas digitales, consenso) y estructuras de datos (bloques, Merkle trees, lista enlazada). Comparación crítica con bases de datos tradicionales: estructura, control, seguridad, rendimiento, escalabilidad y casos de uso industriales.",
+
+  chips: ["Motivación", "Cripto + Consenso", "Estructuras + Comparativa BD"],
+
+  figure: {
+    src: "img/u5_portada.jpg",
+    alt: "Portada unidad 5: introducción a blockchain",
+    caption: "Unidad 5: blockchain como infraestructura de confianza sin intermediarios."
+  },
+
+  blocks: [
+    {
+      h3: "5.1 Concepto y motivación detrás de Blockchain",
+      p: [
+        "Blockchain es una tecnología de registro distribuido (DLT) donde la información se almacena en una estructura de bloques interconectados. A diferencia de una base de datos tradicional, no hay una entidad central controlando el sistema: el estado se acuerda mediante mecanismos criptográficos y algoritmos distribuidos.",
+        "Su origen se remonta a Bitcoin (2008). Aunque se diseñó para transacciones de criptomonedas, su potencial se extendió a finanzas, logística, votación electrónica e identidad digital. La idea clave no es ‘la moneda’, sino el modelo de confianza: convertir la verificación en una propiedad del sistema."
+      ],
+      ul: [
+        "Descentralización: reduce intermediarios, costes y riesgos de censura/manipulación.",
+        "Transparencia: permite verificación y auditoría (trazabilidad).",
+        "Inmutabilidad: lo registrado no se altera sin evidencias (cambia toda la cadena).",
+        "Seguridad: criptografía y firmas digitales para autenticidad sin revelar secretos.",
+        "Reducción de costes e inclusión financiera: menos fricción y acceso sin banca tradicional."
+      ]
+    },
+
+    {
+      h3: "5.2 Aplicaciones más allá de las criptomonedas (visión de negocio)",
+      p: [
+        "La unidad subraya que blockchain se vuelve relevante cuando el problema central es la confianza entre actores, la trazabilidad, la auditoría y la resistencia a manipulaciones. Por eso aparecen casos de uso fuera del dinero.",
+        "Estas aplicaciones suelen apoyarse en redes públicas o permisionadas, y a menudo conviven con sistemas tradicionales: blockchain no reemplaza todo, sino que aporta una capa de verificación y registro."
+      ],
+      ul: [
+        "Contratos inteligentes: ejecución automática de acuerdos (ej.: pagos condicionados).",
+        "Cadena de suministro: trazabilidad de productos y eventos logísticos.",
+        "Identidad digital: credenciales verificables y descentralizadas para personas sin documentación.",
+        "Votaciones electrónicas: registro verificable y reducción de fraude (con retos técnicos y de diseño)."
+      ]
+    },
+
+    {
+      h3: "5.3 Fundamentos matemáticos: criptografía en blockchain",
+      p: [
+        "La seguridad y confiabilidad de blockchain se apoya en criptografía y problemas matemáticos ‘difíciles’. La criptografía no es un accesorio: es el mecanismo que hace que el sistema sea verificable y resistente a alteraciones.",
+        "En la unidad se destacan tres piezas: funciones hash (identidad e integridad), firmas digitales (autenticidad), y problemas criptográficos (PoW, ZKP) que dan soporte a la seguridad del consenso."
+      ],
+      ul: [
+        "Funciones hash: identificadores únicos de bloques/transacciones e integridad (ej.: SHA-256 en Bitcoin).",
+        "Firmas digitales: prueban autoría sin revelar la clave privada (ej.: ECDSA en Bitcoin/Ethereum).",
+        "Problemas criptográficos: PoW y ZKP como ejemplos de ‘pruebas’ matemáticas."
+      ],
+      code:
+`Ejemplo conceptual de hash (tipo SHA-256):
+- Entrada:  "Bloque 1000"
+- Salida:   f6e3aeb41bbf6bc5b8a70ea...
+Idea clave:
+- Un cambio mínimo en la entrada => hash completamente distinto (efecto avalancha)
+- Esto hace "tamper-evident" la cadena`
+    },
+
+    {
+      h3: "5.4 Consenso: cómo se acuerda el estado sin autoridad central",
+      p: [
+        "En una red distribuida, los participantes deben ponerse de acuerdo sobre qué transacciones son válidas y qué bloque se añade a continuación. El consenso es la pieza que permite que todos los nodos mantengan un registro consistente sin confiar en un ‘servidor central’.",
+        "La unidad introduce los protocolos más comunes y su intuición: PoW (trabajo computacional), PoS (apuesta de valor) y DPoS (validadores elegidos por votación)."
+      ],
+      ul: [
+        "PoW (Proof of Work): mineros compiten resolviendo acertijos (nonce bajo un umbral).",
+        "PoS (Proof of Stake): validadores se seleccionan según stake (monedas bloqueadas).",
+        "DPoS: validadores elegidos mediante votación (eficiencia mayor, modelo más ‘gobernado’)."
+      ],
+      code:
+`Ejemplo PoW (idea):
+Objetivo: encontrar un nonce tal que Hash(bloque + nonce) < umbral
+- Repetir intentos: nonce = 0,1,2,3...
+- Cuando se cumple, el bloque se considera válido y se propaga a la red`
+    },
+
+    {
+      h3: "5.5 Estructuras de datos: bloques, cadenas y Merkle trees",
+      p: [
+        "Blockchain organiza transacciones agrupándolas en bloques. Los bloques se enlazan criptográficamente: cada bloque incluye el hash del bloque anterior, formando una cadena. Esto hace que modificar un bloque antiguo invalide los siguientes.",
+        "Para verificar muchas transacciones de forma eficiente, se usan árboles de Merkle: combinan hashes por niveles hasta llegar a una raíz (Merkle Root). Si cambia una transacción, cambia la raíz, y la alteración se detecta."
+      ],
+      ul: [
+        "Bloques: transacciones + timestamp + hash del anterior + (nonce en PoW).",
+        "Cadena: enlace por hashes => secuencia e inmutabilidad práctica.",
+        "Árbol de Merkle: verificación eficiente del conjunto de transacciones.",
+        "Blockchain como lista enlazada: cada bloque apunta al anterior."
+      ],
+      code:
+`Ejemplo de Merkle tree (4 transacciones):
+TX1 = Hash(A)
+TX2 = Hash(B)
+TX3 = Hash(C)
+TX4 = Hash(D)
+
+H1 = Hash(TX1 + TX2)
+H2 = Hash(TX3 + TX4)
+MerkleRoot = Hash(H1 + H2)
+
+Si cambia A => cambia TX1 => cambia H1 => cambia MerkleRoot (alarma de integridad)`
+    },
+
+    {
+      h3: "5.6 Blockchain vs Bases de Datos tradicionales (comparación útil para decidir)",
+      p: [
+        "La unidad insiste en que son tecnologías con propósitos distintos. Blockchain prioriza descentralización, seguridad criptográfica e inmutabilidad. Las bases de datos priorizan rendimiento, escalabilidad y control administrativo.",
+        "La comparación se hace por: estructura de datos, centralización, control de acceso, seguridad frente a manipulación, rendimiento (TPS vs consultas/seg) y casos de uso. En muchos escenarios, la solución realista es híbrida."
+      ],
+      ul: [
+        "Estructura: blockchain (bloques inmutables) vs BD (tablas SQL / modelos NoSQL editables).",
+        "Centralización: blockchain distribuida vs BD controlada por una entidad.",
+        "Acceso: blockchain pública o permisionada (ej.: Hyperledger/Corda) vs BD con control total del admin.",
+        "Seguridad: blockchain resistente a manipulación por estructura criptográfica; BD depende de permisos/cifrado/backups.",
+        "Rendimiento: blockchain limitada por consenso (Bitcoin ~5–7 TPS; Ethereum ~15–30 TPS) y mejoras Layer 2; BD puede manejar millones de consultas/seg."
+      ]
+    }
+  ],
+
+  extras: [
+    {
+      title: "Resultados de aprendizaje (qué deberían dominar)",
+      p: [
+        "Entender el concepto de Blockchain y las razones detrás de su creación e implementación.",
+        "Comprender los fundamentos matemáticos y las estructuras de datos que permiten el funcionamiento de Blockchain.",
+        "Comparar blockchain frente a bases de datos tradicionales y evaluar ventajas/desventajas según el contexto.",
+        "Discutir aplicaciones más allá de criptomonedas (supply chain, votación, identidad, registros).",
+        "Reflexionar sobre desafíos actuales: escalabilidad, rendimiento y regulación."
+      ]
+    },
+    {
+      title: "Idea de práctica (para clase + refuerzo)",
+      p: [
+        "Práctica 1: ‘Simula una blockchain simple’. Crear 4–6 bloques con: índice, timestamp, datos, hash_anterior y hash_actual. Verificar qué pasa si se modifica un bloque antiguo.",
+        "Práctica 2: ‘Decisión tecnológica’. Dado un caso (logística, banco, inventario), justificar si usarías BD, blockchain o solución híbrida con argumentos de estructura, control, seguridad y rendimiento."
+      ]
+    }
+  ]
+},
 
 //------------------------------------------------------------------------------------------------------------------------------
 //
