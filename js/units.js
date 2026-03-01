@@ -399,6 +399,206 @@ NO repetir nonce con la misma clave`
     }
   ]
 },
+//------------------------------------------------------------------------------------------------------------------------------
+//
+//  UNIDAD 4 — ESQUEMA (igual estilo que U2)
+//------------------------------------------------------------------------------------------------------------------------------
+{
+  id: "u4",
+  number: 4,
+  title: "Unidad 4 — Criptografía Asimétrica (RSA, Firma Digital y Certificados)",
+  summary:
+    "Introducción a la criptografía de clave pública: par de claves (pública/privada), flujos de cifrado/descifrado y firma/verificación. Estudio del algoritmo RSA (fundamentos matemáticos, generación de claves y uso práctico en seguridad web). Cierre con firma digital, certificados digitales y PKI: confianza, validación y revocación, con prácticas guiadas usando OpenSSL.",
+  chips: ["Clave pública/privada", "RSA", "Firma digital", "Certificados", "PKI", "TLS/HTTPS"],
+
+  figure: {
+    src: "img/u4_portada.jpg",
+    alt: "Portada unidad 4: criptografía asimétrica, RSA, firma digital y certificados",
+    caption: "Unidad 4: identidad y confianza en Internet mediante criptografía asimétrica."
+  },
+
+  blocks: [
+    {
+      h3: "4.1 Criptografía asimétrica: concepto y motivación",
+      p: [
+        "La criptografía asimétrica (clave pública) nace para resolver el problema de arrancar comunicaciones seguras sin intercambiar previamente un secreto. En lugar de una clave compartida, cada entidad genera un par de claves relacionadas matemáticamente: una clave pública (distribuible) y una clave privada (secreta).",
+        "Este paradigma permite dos funciones esenciales: (1) confidencialidad mediante cifrado con clave pública del destinatario y descifrado con su clave privada; (2) autenticación e integridad mediante firma digital, donde la clave privada produce la firma y la pública la verifica.",
+        "La unidad conecta estos conceptos con usos reales: navegación segura (HTTPS/TLS), firma de documentos, correo seguro y sistemas de certificación (PKI) que convierten una clave pública en una identidad verificable."
+      ],
+      ul: [
+        "Dos claves (pública/privada) en vez de una sola compartida.",
+        "Dos procesos principales: cifrado/descifrado y firma/verificación.",
+        "Base de confianza para identidad digital y transacciones seguras."
+      ]
+    },
+
+    {
+      h3: "4.2 Claves pública y privada: definición y funcionamiento",
+      p: [
+        "La clave pública es el componente que se comparte para que terceros puedan cifrar hacia ti o verificar tus firmas. La clave privada es el componente que nunca debe salir del control del propietario: con ella descifras lo cifrado para ti y firmas en tu nombre.",
+        "Un error típico en alumnos es mezclar los dos usos (confidencialidad vs autenticación). Aquí se debe fijar el modelo mental: 'Cifrar para ti' usa tu pública; 'Firmar como tú' usa tu privada.",
+        "A partir de esta base, la unidad presenta ventajas (no intercambio previo, autenticación fuerte) y riesgos (rendimiento, gestión de claves, impacto crítico si se filtra la privada)."
+      ],
+      ul: [
+        "Clave pública: cifrar hacia el destinatario / verificar firmas del emisor.",
+        "Clave privada: descifrar lo recibido / firmar documentos o mensajes.",
+        "Compromiso de la privada = pérdida de confidencialidad y suplantación."
+      ]
+    },
+
+    {
+      h3: "4.3 Dos flujos que hay que dominar: (A) cifrado y (B) firma",
+      p: [
+        "Flujo A — Cifrado/Descifrado (confidencialidad): el emisor cifra con la clave pública del destinatario. Aunque el mensaje viaje por Internet, solo el destinatario puede abrirlo con su clave privada.",
+        "Flujo B — Firma/Verificación (autenticidad + integridad): el emisor firma (normalmente el hash del documento) con su clave privada. Cualquiera puede verificar la firma con la clave pública del emisor y detectar modificaciones.",
+        "El objetivo de esta sección es que el alumno sea capaz de mirar un diagrama y decir sin dudar: 'esto es cifrado' o 'esto es firma', y qué clave se usa en cada paso."
+      ],
+      ul: [
+        "Cifrado: pública del destinatario → privada del destinatario.",
+        "Firma: privada del emisor → pública del emisor.",
+        "Firma no implica ocultar el contenido: garantiza origen e integridad."
+      ]
+    },
+
+    {
+      h3: "4.4 Ventajas y desafíos (incluye MITM y gestión de claves)",
+      p: [
+        "Ventajas: no hace falta intercambiar una clave secreta antes de empezar; habilita firmas digitales; mejora la autenticación en sistemas distribuidos; y es base de infraestructuras complejas como TLS/HTTPS y PKI.",
+        "Desafíos: la criptografía asimétrica consume más recursos que la simétrica (por eso se usa de forma híbrida en muchos protocolos); requiere infraestructura de gestión (generación, rotación, almacenamiento, revocación); y la exposición de la clave privada es un fallo catastrófico.",
+        "MITM: el modelo de clave pública reduce ciertos riesgos, pero si el atacante consigue que confíes en su clave pública 'como si' fuera la del servidor real, puede interponerse. De ahí la necesidad de certificados y cadenas de confianza."
+      ],
+      ul: [
+        "Ventaja: arranque seguro sin secreto compartido previo.",
+        "Problema: coste computacional y operación (gestión de claves).",
+        "MITM: se mitiga de verdad cuando la clave pública está ligada a identidad (certificados/PKI)."
+      ]
+    },
+
+    {
+      h3: "4.5 RSA: fundamentos matemáticos mínimos (para entenderlo de verdad)",
+      p: [
+        "RSA se apoya en teoría de números: dos primos grandes p y q, su producto n = p·q y la dificultad práctica de factorizar n cuando los primos son grandes.",
+        "El cifrado y descifrado se basan en exponenciación modular: elevar a un exponente y reducir módulo n. Aparece el papel de φ(n) (totiente de Euler) para construir los exponentes e (público) y d (privado) como inversos modulares.",
+        "Esta sección debe ser 'matemáticas mínimas pero correctas': que el alumno entienda qué se calcula, por qué, y qué parte es el secreto real."
+      ],
+      ul: [
+        "Primos y factorización: n = p·q es fácil; factorizar n es difícil.",
+        "Aritmética modular: operaciones 'mod n' (exponenciación modular).",
+        "Totiente φ(n): base para calcular d como inverso de e."
+      ]
+    },
+
+    {
+      h3: "4.6 RSA: generación de claves + cifrado/descifrado (con ejemplo guiado)",
+      p: [
+        "Generación de claves (visión paso a paso): elegir p y q; calcular n = p·q; calcular φ(n) = (p−1)(q−1); elegir e coprimo con φ(n); calcular d tal que e·d ≡ 1 (mod φ(n)). La pública es (n,e) y la privada es (n,d).",
+        "Cifrado: c = m^e mod n. Descifrado: m = c^d mod n. Con números pequeños se puede simular para entender el flujo, aunque en producción se usan tamaños enormes y padding seguro (esto se menciona como idea, sin entrar en estandarización si no toca).",
+        "La meta práctica: que puedan simular una ejecución completa con un ejemplo de juguete y luego relacionarlo con usos reales (TLS, firma, PGP)."
+      ],
+      code:
+`RSA (esqueleto didáctico):
+1) Elegir primos p, q
+2) n = p*q
+3) phi = (p-1)*(q-1)
+4) Elegir e tal que gcd(e, phi)=1
+5) Calcular d = inv_mod(e, phi)
+
+Clave pública  = (n, e)
+Clave privada  = (n, d)
+
+Cifrado:    c = m^e mod n
+Descifrado: m = c^d mod n`
+    },
+
+    {
+      h3: "4.7 RSA en la vida real: TLS/HTTPS, PGP/GPG y PKI + futuro",
+      p: [
+        "Aplicaciones: en TLS/HTTPS, RSA puede intervenir para establecer seguridad (históricamente para intercambio/arranque), y en general aparece en autenticación y firma. En PGP/GPG se usa para cifrar y firmar correos/archivos. En PKI es un componente típico para emisión/validación de certificados.",
+        "Limitaciones actuales: RSA requiere claves grandes para alta seguridad, lo que lo hace menos eficiente que alternativas modernas como ECC en muchos escenarios.",
+        "Futuro: se introduce el riesgo de computación cuántica (Shor) como motivación para investigar criptografía post-cuántica. El alumno debe salir con la idea: 'RSA sigue siendo pilar, pero no es eterno'."
+      ],
+      ul: [
+        "TLS/HTTPS: identidad + canal seguro (arquitectura híbrida).",
+        "PGP/GPG: cifrado y firma en correo/archivos.",
+        "Desafíos: tamaño de clave, rendimiento, amenaza cuántica, transición a post-cuántica."
+      ]
+    },
+
+    {
+      h3: "4.8 Firma digital: proceso, propiedades y aplicaciones",
+      p: [
+        "Proceso estándar (conceptual): (1) calcular hash del documento; (2) 'firmar' cifrando el hash con la clave privada del firmante; (3) verificar descifrando con la clave pública y comparando con el hash recalculado del documento recibido.",
+        "Propiedades: autenticidad (quién firmó), integridad (no se alteró), no repudio (el firmante no puede negar de forma creíble si su clave privada está bajo su control).",
+        "Aplicaciones: contratos digitales, transacciones financieras, correo seguro y validación de transacciones en blockchain/cripto (firmas para autorizar operaciones)."
+      ],
+      ul: [
+        "Firma = hash(documento) firmado con clave privada.",
+        "Verificación = clave pública + comparación de hashes.",
+        "Aporta autenticidad, integridad y no repudio."
+      ]
+    },
+
+    {
+      h3: "4.9 Certificados digitales y PKI: identidad verificable en Internet",
+      p: [
+        "Un certificado digital asocia una clave pública con una identidad (persona/empresa/servidor). Lo emite una Autoridad de Certificación (CA) y va firmado por ella para que terceros puedan confiar en esa asociación.",
+        "Contenido típico: clave pública, datos del titular, datos de la CA emisora, fechas (emisión/expiración) y firma digital de la CA. Funcionamiento: se solicita, se verifica identidad (a veces mediante una RA), la CA firma y el cliente (por ejemplo un navegador) valida el certificado con la clave pública de la CA.",
+        "PKI: el 'sistema' alrededor de certificados: CA (emite), RA (valida identidad), repositorios y mecanismos de revocación (CRL/OCSP). Esta parte conecta directamente con HTTPS: tu navegador no 'cree' al servidor, verifica su certificado y su cadena de confianza."
+      ],
+      ul: [
+        "Certificado: identidad ↔ clave pública (firmado por una CA).",
+        "PKI: CA + RA + repositorios + revocación/validación.",
+        "No confundir: firma digital asegura documento; certificado asegura identidad de la clave."
+      ]
+    },
+
+    {
+      h3: "4.10 Laboratorio guiado (OpenSSL) + mini-casos de ataque",
+      p: [
+        "Práctica 1: generar un par de claves RSA, exportar la clave pública y entender qué se comparte vs qué se protege.",
+        "Práctica 2: firmar un mensaje/archivo y verificar la firma con la clave pública. Repetir modificando 1 byte del archivo para comprobar que la verificación falla (integridad).",
+        "Práctica 3: inspeccionar un certificado X.509, identificar campos clave (issuer, subject, validez) y razonar sobre cadena de confianza y revocación. Cierre con mini-casos: intento de MITM con clave falsa, clave privada comprometida y certificado caducado."
+      ],
+      code:
+`OpenSSL (mínimo para prácticas):
+# 1) Generar clave privada RSA
+openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out priv.pem
+
+# 2) Extraer clave pública
+openssl pkey -in priv.pem -pubout -out pub.pem
+
+# 3) Firmar (hash + firma)
+openssl dgst -sha256 -sign priv.pem -out firma.bin mensaje.txt
+
+# 4) Verificar firma
+openssl dgst -sha256 -verify pub.pem -signature firma.bin mensaje.txt
+
+# 5) Ver un certificado (si tienes server.crt)
+openssl x509 -in server.crt -noout -text`
+    }
+  ],
+
+  extras: [
+    {
+      title: "Resultados de aprendizaje (qué deberían dominar)",
+      p: [
+        "Comprender y explicar criptografía asimétrica: generación y uso de claves pública/privada.",
+        "Describir RSA desde fundamentos matemáticos hasta su aplicación en cifrado y firma.",
+        "Implementar o simular cifrado/descifrado RSA y relacionarlo con seguridad web (HTTPS/TLS).",
+        "Explicar firma digital (integridad, autenticidad, no repudio) y aplicaciones reales.",
+        "Analizar certificados digitales, confianza, validación y revocación; entender PKI.",
+        "Evaluar desafíos: ataques, gestión de claves y evolución hacia criptografía post-cuántica."
+      ]
+    },
+    {
+      title: "Idea de práctica para tu web (HTML5 + ejercicios)",
+      p: [
+        "Actividad sugerida: ‘Diagnóstico de seguridad’. Das 4 mini-escenarios (cifrado, firma, MITM, clave privada comprometida) y el alumno debe: (1) clasificar el tipo de problema, (2) decir qué mecanismo lo evita (firma, certificado/PKI, rotación/revocación, etc.), (3) justificarlo en 3 líneas.",
+        "Complemento: un ‘visor de certificados’ simple (frontend) que muestre campos clave (subject, issuer, validez) y un quiz de ‘¿confiarías o no?’ con casos de caducado, issuer desconocido, hostname mismatch."
+      ]
+    }
+  ]
+},
 
 //------------------------------------------------------------------------------------------------------------------------------
 //
