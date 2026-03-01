@@ -1023,7 +1023,279 @@ contract PagoAutomatico {
     }
   ]
 },
+//------------------------------------------------------------------------------------------------------------------------------
+//
+// Unidad 7 — Minería en Blockchain
+//
+//------------------------------------------------------------------------------------------------------------------------------
+{
+  id: "u7",
+  number: 7,
+  title: "Unidad 7 — Minería en Blockchain",
+  summary:
+    "Qué es la minería y por qué permite consenso sin autoridad central. Proof of Work vs Proof of Stake y otros mecanismos (DPoS, PoA, PoB, Space/Time). Problemas reales: centralización, consumo energético y escalabilidad; y soluciones como SegWit, Lightning, rollups y sharding.",
+  chips: ["Minería", "Consenso (PoW/PoS)", "Energía + Escalabilidad"],
 
+  figure: {
+    src: "img/u7_portada.jpg",
+    alt: "Portada unidad 7: minería y consenso en blockchain",
+    caption: "Unidad 7: cómo se valida la verdad en blockchain — consenso, energía y escalabilidad."
+  },
+
+  blocks: [
+    {
+      h3: "7.1 Concepto y función de la minería en Blockchain",
+      p: [
+        "La minería es el proceso por el cual las transacciones se verifican y se añaden a la blockchain. En redes basadas en Proof of Work, los mineros compiten por resolver un reto matemático y el ganador propone el siguiente bloque.",
+        "La minería cumple tres funciones clave: registrar transacciones válidas (evitando doble gasto), aportar seguridad (hacer ataques computacionalmente inviables) y, en algunas redes, emitir nuevas monedas como incentivo."
+      ],
+      ul: [
+        "Validación: transacciones legítimas y sin doble gasto.",
+        "Seguridad: coste computacional alto para atacar/reescribir la cadena.",
+        "Incentivos/emisión: recompensa + fees por incluir transacciones en el bloque."
+      ]
+    },
+
+    {
+      h3: "7.2 Consenso distribuido: cómo la red se pone de acuerdo",
+      p: [
+        "En blockchain no hay un “jefe” que valide: los nodos deben aceptar un estado único sin autoridad central. Ese acuerdo es el consenso distribuido.",
+        "Para aceptar un bloque, debe cumplir las reglas del algoritmo (PoW/PoS) y además ser validado por la mayoría de nodos. Así se evita manipulación y todas las copias permanecen consistentes."
+      ],
+      ul: [
+        "Evita fraudes y manipulaciones.",
+        "Garantiza que todas las copias de la cadena sean idénticas.",
+        "Permite descentralización: no depende de bancos/autoridades centrales."
+      ]
+    },
+
+    {
+      h3: "7.3 Proceso de minería (PoW): del mempool al bloque aceptado",
+      p: [
+        "Paso 1: el minero agrupa transacciones no confirmadas en un bloque candidato. Paso 2: busca un nonce que produzca un hash con la dificultad exigida (por ejemplo, que empiece con muchos ceros).",
+        "Paso 3: cuando lo encuentra, propaga el bloque y los nodos verifican. Paso 4: recibe recompensa (subsidio) y comisiones. En Bitcoin, el subsidio se reduce periódicamente en eventos tipo ‘halving’."
+      ],
+      ul: [
+        "Agrupar transacciones → construir bloque candidato.",
+        "Buscar nonce → hash válido (dificultad/target).",
+        "Propagar/validar → añadir a la cadena.",
+        "Cobrar recompensa + fees (modelo de incentivos)."
+      ],
+      code:
+`// PoW simplificado (idea conceptual)
+target = difficultyToTarget(difficulty)
+nonce = 0
+do {
+  hash = SHA256(blockHeader + nonce)
+  nonce++
+} while (hash > target)
+
+// Si hash cumple target → el bloque se acepta y se propaga a la red`
+    },
+
+    {
+      h3: "7.4 Tipos de minería: individual, pools y cloud mining",
+      p: [
+        "La minería individual (solo) compite contra toda la red: hoy suele ser difícil obtener recompensa por la competencia y la dificultad.",
+        "Los pools agregan potencia de cómputo: aumentan probabilidad y reparten recompensas proporcionalmente. El cloud mining alquila hashpower a terceros: reduce la inversión en equipos, pero añade riesgo (fraude y baja rentabilidad)."
+      ],
+      ul: [
+        "Individual: control total, pero probabilidad baja y recompensas irregulares.",
+        "Pools: recompensas más estables, pero riesgo de centralización.",
+        "Cloud mining: sin hardware propio, pero dependes de terceros (riesgo/ROI)."
+      ]
+    },
+
+    {
+      h3: "7.5 Algoritmos de consenso: PoW vs PoS y alternativas",
+      p: [
+        "PoW aporta seguridad fuerte, pero consume mucha energía, escala peor y tiende a concentrarse en grandes pools. PoS cambia mineros por validadores: se eligen según stake, reciben recompensa y pueden ser penalizados (slashing) si actúan mal.",
+        "Además aparecen variantes: DPoS (delegados votados), PoA (validadores por identidad/reputación en redes privadas), PoB (quema de tokens), Proof of Space (disco) y Proof of Time (factor temporal en modelos híbridos)."
+      ],
+      ul: [
+        "PoW: seguridad alta, pero energía + escalabilidad + pools.",
+        "PoS: eficiencia energética, pero riesgo de centralización por riqueza.",
+        "DPoS/PoA/PoB/Space/Time: diseños para casos específicos (públicas/privadas)."
+      ]
+    },
+
+    {
+      h3: "7.6 Impacto energético y sostenibilidad de la minería",
+      p: [
+        "El gran coste de PoW viene de cálculos intensivos, competencia simultánea y uso de hardware especializado (ASIC). Esto abre un debate ambiental: emisiones (si la energía es fósil) y e-waste por obsolescencia rápida.",
+        "Dos líneas de mejora: migrar a PoS (reduce drásticamente consumo) y usar energía renovable (hidro, solar/eólica, geotérmica) para disminuir la huella."
+      ],
+      ul: [
+        "Causas: complejidad + competencia + ASICs.",
+        "Impacto: huella de carbono y residuos electrónicos.",
+        "Mitigación: PoS + minería con renovables."
+      ]
+    },
+
+    {
+      h3: "7.7 Escalabilidad: límites y soluciones (SegWit, L2, rollups, sharding)",
+      p: [
+        "En PoW la escalabilidad se limita por tamaño de bloque, tiempo de confirmación y tarifas en congestión. Esto afecta a TPS, latencia y coste.",
+        "Soluciones: SegWit optimiza el espacio separando firmas; capas 2 como Lightning mueven transacciones fuera de la cadena principal; rollups agrupan transacciones (especialmente en Ethereum); y sharding paraleliza procesamiento dividiendo la red en fragmentos."
+      ],
+      ul: [
+        "Problemas: TPS bajo, confirmación lenta, fees altos en picos.",
+        "SegWit: más eficiencia por bloque.",
+        "L2 (Lightning): pagos rápidos y baratos fuera de cadena.",
+        "Rollups: lotes fuera de cadena; Sharding: paralelismo por fragmentos."
+      ]
+    }
+  ],
+
+  extras: [
+    {
+      title: "Resultados de aprendizaje (qué deberían dominar)",
+      p: [
+        "Comprender la minería en Blockchain y su papel en el consenso distribuido.",
+        "Diferenciar algoritmos de consenso (PoW, PoS y alternativos) y justificar pros/contras.",
+        "Analizar problemas reales: energía, centralización y escalabilidad, y evaluar soluciones.",
+        "Relacionar decisiones de consenso con objetivos: seguridad, coste, sostenibilidad y rendimiento."
+      ]
+    },
+    {
+      title: "Idea de práctica para enlazar con tu web (HTML5)",
+      p: [
+        "Actividad sugerida: ‘Simulador de minería PoW’. La app permite ajustar dificultad/target, iterar nonces y ver cómo cambia el tiempo esperado. Segundo bloque: comparar ‘PoW vs PoS’ con un mini-simulador de selección de validadores por stake + slashing conceptual. Conclusión escrita: trade-offs y qué consenso escogerían para un caso dado."
+      ]
+    }
+  ]
+},
+//------------------------------------------------------------------------------------------------------------------------------
+//
+// Unidad 8 — Fundamentos de Minería de Datos
+//
+//------------------------------------------------------------------------------------------------------------------------------
+{
+  id: "u8",
+  number: 8,
+  title: "Unidad 8 — Fundamentos de Minería de Datos",
+  summary:
+    "Introducción a la minería de datos como parte del ciclo KDD: extraer conocimiento útil a partir de grandes volúmenes de información. Objetivos (patrones, predicción, clasificación, segmentación), aplicaciones reales, retos éticos. Técnicas clave de preprocesamiento y limpieza, y una panorámica de métodos estadísticos avanzados (regresión, clústeres, PCA, supervivencia, series temporales) con validación.",
+  chips: ["KDD", "Preprocesamiento + Limpieza", "Regresión + Clustering + Validación"],
+
+  figure: {
+    src: "img/u8_portada.jpg",
+    alt: "Portada unidad 8: fundamentos de minería de datos (KDD, preprocesamiento, modelos)",
+    caption: "Unidad 8: transformar datos brutos en decisiones mediante minería de datos."
+  },
+
+  blocks: [
+    {
+      h3: "8.1 Concepto de minería de datos y ciclo KDD",
+      p: [
+        "En la era digital, no basta con almacenar datos: el valor aparece cuando somos capaces de extraer patrones y conocimiento accionable. La minería de datos combina estadística, aprendizaje automático e IA para descubrir tendencias y correlaciones en grandes conjuntos de datos.",
+        "La minería de datos se entiende como parte del proceso KDD (Knowledge Discovery in Databases): un flujo que va desde la recolección de datos hasta la implementación de decisiones basadas en resultados validados."
+      ],
+      ul: [
+        "KDD: datos → preparación → algoritmos → interpretación/validación → decisión.",
+        "Objetivo final: convertir información masiva en ventaja competitiva o mejora de procesos.",
+        "Clave mental: sin preparación/validación, el “conocimiento” puede ser ruido."
+      ]
+    },
+
+    {
+      h3: "8.2 Objetivos principales: patrones, predicción, clasificación y segmentación",
+      p: [
+        "La minería de datos puede perseguir objetivos distintos según el problema: descubrir relaciones ocultas, anticipar eventos futuros, asignar categorías a casos o dividir una población en grupos homogéneos.",
+        "Estos objetivos aparecen una y otra vez en proyectos reales: desde recomendaciones y detección de fraude hasta diagnóstico asistido y análisis de riesgo."
+      ],
+      ul: [
+        "Descubrimiento de patrones: relaciones no obvias (ej.: cesta de la compra).",
+        "Predicción: modelos con datos históricos (ej.: impago de préstamo).",
+        "Clasificación: etiquetas (ej.: nivel de riesgo médico / fraude sí-no).",
+        "Segmentación: clustering de perfiles (ej.: campañas de marketing personalizadas)."
+      ]
+    },
+
+    {
+      h3: "8.3 Aplicaciones reales + impacto social (retos y ética)",
+      p: [
+        "La minería de datos se aplica en marketing/e-commerce (recomendaciones, churn), finanzas (fraude, scoring), salud (diagnóstico, brotes) y sector público (optimización de recursos, fiscalidad, seguridad).",
+        "Pero también implica desafíos: privacidad, protección de datos, sesgos históricos y decisiones automatizadas que pueden afectar a personas y colectivos."
+      ],
+      ul: [
+        "Marketing: recomendadores, sentimiento, pricing dinámico.",
+        "Finanzas: fraude en tiempo real, riesgos crediticios, series temporales.",
+        "Salud: clasificación de imágenes, eficacia de tratamientos, epidemias.",
+        "Gobierno/seguridad: criminalidad, transporte, fraude fiscal.",
+        "Ética: GDPR/privacidad y sesgos en modelos (riesgo de discriminación)."
+      ]
+    },
+
+    {
+      h3: "8.4 Preprocesamiento de datos (integración, transformación y reducción)",
+      p: [
+        "El preprocesamiento prepara los datos para que los algoritmos funcionen: integra fuentes heterogéneas, transforma formatos/escalas y reduce complejidad sin perder información clave.",
+        "Es un paso crítico porque la mayoría de datasets reales llegan mezclados, incompletos y con escalas incompatibles."
+      ],
+      ul: [
+        "Integración: fusión de fuentes, resolución de conflictos, mapeo de esquemas.",
+        "Transformación: normalización, codificación categórica, agregación, discretización.",
+        "Reducción: selección de características, PCA, muestreo representativo."
+      ],
+      code:
+`Pipeline mental:
+1) Integrar (unificar fuentes) → 2) Transformar (hacer comparable) → 3) Reducir (quitar lo que sobra)
+Si te saltas esto: el modelo aprende “artefactos”, no realidad.`
+    },
+
+    {
+      h3: "8.5 Limpieza de datos (errores, faltantes, ruido/duplicados, estandarización)",
+      p: [
+        "La limpieza elimina inconsistencias, errores y redundancias que distorsionan el análisis. Sin limpieza, los modelos pueden dar predicciones erróneas y conclusiones engañosas.",
+        "Incluye corregir valores imposibles, tratar datos faltantes con criterio, eliminar duplicados/ruido y estandarizar formatos (unidades, fechas, texto)."
+      ],
+      ul: [
+        "Datos incorrectos: reglas lógicas, corrección manual/automática, eliminación de valores imposibles.",
+        "Datos faltantes: eliminar registros vs imputar (media/mediana) vs modelos predictivos.",
+        "Ruido y duplicados: outliers (boxplot/desviación), deduplicación por claves, filtrado/suavizado.",
+        "Estandarización: unidades, formatos de fecha, normalización de cadenas."
+      ]
+    },
+
+    {
+      h3: "8.6 Métodos estadísticos avanzados + validación (visión global)",
+      p: [
+        "Una vez los datos están listos, aplicamos técnicas para predecir, clasificar, segmentar o extraer estructura: regresión (lineal/logística), clústeres (k-means/jerárquico), reducción (PCA), supervivencia (Cox) y series temporales (ARIMA/SARIMA).",
+        "Antes de llevar un modelo a producción, se evalúa con validación (por ejemplo, validación cruzada) para reducir sobreajuste y asegurar robustez."
+      ],
+      ul: [
+        "Regresión lineal: predicción numérica; interpretable, sensible a outliers.",
+        "Regresión logística: clasificación; devuelve probabilidades.",
+        "Clustering: segmentación sin etiquetas (k-means, jerárquico).",
+        "PCA: reducir dimensionalidad preservando estructura.",
+        "Supervivencia (Cox): tiempo hasta evento (p. ej., fallo/recidiva).",
+        "Series temporales: ARIMA/SARIMA (tendencia + estacionalidad).",
+        "Validación cruzada: medir generalización y evitar sobreajuste."
+      ]
+    }
+  ],
+
+  extras: [
+    {
+      title: "Resultados de aprendizaje (qué deberían dominar)",
+      p: [
+        "Comprender los objetivos fundamentales de la minería de datos e identificar aplicaciones prácticas en diferentes sectores.",
+        "Dominar técnicas esenciales de preprocesamiento y limpieza, entendiendo su impacto en la calidad de los análisis posteriores.",
+        "Aplicar métodos estadísticos avanzados para extraer conocimiento útil (predicción, clasificación, tendencias).",
+        "Evaluar críticamente resultados considerando validez, precisión y aplicabilidad.",
+        "Implementar técnicas de validación para asegurar robustez de modelos predictivos y de clasificación."
+      ]
+    },
+    {
+      title: "Idea de práctica para enlazar con tu web (HTML5)",
+      p: [
+        "Actividad sugerida (mini-proyecto): “Dataset de principio a fin”. Dar un dataset real (churn, fraude o ventas) y obligar a pasar por: (1) integración/estandarización, (2) limpieza (faltantes + duplicados + outliers), (3) transformación (normalización + categóricas), (4) un modelo simple (logística o k-means), (5) validación cruzada + conclusiones.",
+        "Entregable: reporte corto con decisiones justificadas (qué limpiaron, qué imputaron, qué variables dejaron fuera y por qué)."
+      ]
+    }
+  ]
+},
 //------------------------------------------------------------------------------------------------------------------------------
 //
 //
