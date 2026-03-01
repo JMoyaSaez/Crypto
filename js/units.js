@@ -749,6 +749,280 @@ Si cambia A => cambia TX1 => cambia H1 => cambia MerkleRoot (alarma de integrida
     }
   ]
 },
+//------------------------------------------------------------------------------------------------------------------------------
+//
+//
+//------------------------------------------------------------------------------------------------------------------------------
+{
+  id: "u6",
+  number: 6,
+  title: "Unidad 6 — Aplicaciones de Blockchain",
+  summary:
+    "Blockchain ha trascendido las criptomonedas para convertirse en una infraestructura de confianza sin intermediarios. En esta unidad veremos: (1) criptomonedas (Bitcoin y Ethereum), (2) contratos inteligentes y sus aplicaciones (DeFi, NFTs, DAOs, seguros, logística) y (3) gestión de documentos oficiales e identidad digital en blockchain, con beneficios y retos reales (escalabilidad, regulación, privacidad/GDPR, costes).",
+  chips: ["Criptomonedas", "Smart Contracts", "Gestión documental"],
+
+  figure: {
+    src: "img/u6_portada.jpg",
+    alt: "Portada unidad 6: aplicaciones de blockchain",
+    caption: "Unidad 6: blockchain como infraestructura de confianza sin intermediarios."
+  },
+
+  blocks: [
+    {
+      h3: "6.1 Introducción a las aplicaciones de Blockchain",
+      p: [
+        "Desde Bitcoin (2008), blockchain ha evolucionado más allá de las criptomonedas: hoy se aplica en contratos inteligentes, gestión documental, logística, identidad digital y otros sectores.",
+        "Su valor diferencial es crear confianza sin una autoridad central: elimina intermediarios, reduce costes y aumenta la verificabilidad de procesos digitales."
+      ],
+      ul: [
+        "Descentralización: participación sin depender de una entidad central.",
+        "Transparencia y verificabilidad: registros auditable por múltiples nodos.",
+        "Seguridad e inmutabilidad: lo registrado no se altera sin dejar evidencia."
+      ]
+    },
+
+    {
+      h3: "6.2 Principales áreas de aplicación (mapa rápido)",
+      p: [
+        "Blockchain se usa donde la confianza, el fraude o la trazabilidad son un problema. En vez de ‘creer’ en un tercero, se valida con reglas y consenso.",
+        "Estas son las áreas más típicas donde el impacto es inmediato."
+      ],
+      ul: [
+        "Criptomonedas: pagos y finanzas descentralizadas (Bitcoin, Ethereum).",
+        "Contratos inteligentes: acuerdos autoejecutables sin intermediarios.",
+        "Gestión de documentos oficiales: diplomas, registros de propiedad, documentos legales.",
+        "Cadenas de suministro y logística: trazabilidad (IBM/Walmart).",
+        "Votación electrónica: registros inmutables para reducir manipulación.",
+        "Salud: historias clínicas y acceso controlado sin comprometer privacidad."
+      ]
+    },
+
+    {
+      h3: "6.3 Criptomonedas: Bitcoin y Ethereum (visión general)",
+      p: [
+        "Bitcoin y Ethereum son las referencias históricas y tecnológicas del ecosistema. Ambas usan blockchain, pero persiguen objetivos distintos.",
+        "Bitcoin se centra en transferencia/reserva de valor; Ethereum amplía el concepto con una blockchain programable (contratos inteligentes y DApps)."
+      ],
+      ul: [
+        "Bitcoin: moneda digital descentralizada, fuerte enfoque en seguridad y escasez.",
+        "Ethereum: plataforma programable para ejecutar lógica (smart contracts) y crear apps.",
+        "Impacto: acelera adopción de blockchain y modelos financieros sin intermediarios."
+      ]
+    },
+
+    {
+      h3: "6.3.1 Bitcoin: características y funcionamiento",
+      p: [
+        "Bitcoin (2008, Satoshi Nakamoto) nace para permitir transferencias de dinero sin bancos ni intermediarios.",
+        "Se apoya en una red pública de nodos y un consenso PoW (minería) para validar y registrar transacciones."
+      ],
+      ul: [
+        "Descentralización: sin control de gobiernos o entidad central.",
+        "Oferta limitada: 21 millones de BTC (activo deflacionario).",
+        "Seguridad y transparencia: transacciones verificadas y registradas públicamente.",
+        "PoW (minería): validación mediante resolución de problemas criptográficos."
+      ]
+    },
+
+    {
+      h3: "6.3.2 ¿Cómo funciona Bitcoin? (paso a paso)",
+      p: [
+        "Bitcoin opera con un flujo simple pero robusto: transacción → validación → agrupación en bloques → consenso → registro permanente.",
+        "El consenso PoW hace costoso modificar el historial y convierte la cadena en un registro altamente resistente a manipulaciones."
+      ],
+      ul: [
+        "Transacciones: envío entre direcciones únicas.",
+        "Validación: difusión a la red y verificación por nodos/mineros.",
+        "Minado y bloques: agrupación de transacciones y competencia por validar el bloque.",
+        "Registro: el bloque validado se añade a la cadena (confirmación)."
+      ]
+    },
+
+    {
+      h3: "6.3.3 Bitcoin: ventajas y desafíos",
+      p: [
+        "Bitcoin destaca por su resistencia y su diseño conservador, pero paga ese diseño con límites de rendimiento y costes operativos.",
+        "Esto explica por qué se buscan soluciones de escalabilidad y por qué la regulación entra en juego."
+      ],
+      ul: [
+        "Ventajas: resistencia a la censura, seguridad criptográfica, escasez programada.",
+        "Desafíos: escalabilidad (~7 tx/s), alto consumo energético (minería), fees altos en picos de demanda."
+      ]
+    },
+
+    {
+      h3: "6.3.4 Ethereum: más que una criptomoneda",
+      p: [
+        "Ethereum (propuesto en 2013 y lanzado en 2015) extiende blockchain para poder ejecutar programas: contratos inteligentes y aplicaciones descentralizadas (DApps).",
+        "Su moneda (ETH) se usa para pagar transacciones y la ejecución de contratos (gas)."
+      ],
+      ul: [
+        "Contratos inteligentes: código autoejecutable en la blockchain.",
+        "EVM: entorno de ejecución descentralizado.",
+        "ETH: activo nativo para transacciones y gas.",
+        "Red programable: DeFi, juegos, mercados NFT, etc."
+      ]
+    },
+
+    {
+      h3: "6.3.5 Ethereum: funcionamiento e innovaciones",
+      p: [
+        "Ethereum sigue una lógica similar a Bitcoin, pero añade la ejecución de código como parte del ‘estado’ de la red.",
+        "Uno de sus cambios clave es la transición a Proof of Stake (PoS), reduciendo drásticamente el consumo energético."
+      ],
+      ul: [
+        "Creación y despliegue de contrato: se publica en la cadena.",
+        "Ejecución por la red: cualquiera puede interactuar sin intermediarios.",
+        "PoS: reducción del consumo energético (según el temario).",
+        "DApps: casos como DeFi y juegos operan sobre la red."
+      ]
+    },
+
+    {
+      h3: "6.3.6 Comparación express: Bitcoin vs Ethereum",
+      p: [
+        "Aunque se suelen meter en el mismo saco, su propuesta de valor es diferente.",
+        "Entender esta diferencia te permite justificar por qué un caso de uso encaja (o no) con una u otra red."
+      ],
+      ul: [
+        "Bitcoin: ‘dinero’/reserva de valor; enfoque en seguridad y descentralización.",
+        "Ethereum: ‘plataforma’ programable; contratos inteligentes + DApps.",
+        "Escalabilidad: se buscan mejoras (Lightning en Bitcoin, Ethereum 2.0 en Ethereum)."
+      ]
+    },
+
+    {
+      h3: "6.4 Contratos inteligentes: definición y flujo de ejecución",
+      p: [
+        "Un contrato inteligente es un programa autoejecutable almacenado en blockchain que se activa cuando se cumplen condiciones definidas.",
+        "Se populariza con Ethereum: el contrato no depende de confianza personal, sino de reglas públicas y ejecución automática."
+      ],
+      ul: [
+        "Definir el acuerdo: condiciones + red donde se ejecutará (p.ej., Ethereum).",
+        "Programar el contrato: lógica ‘si-entonces’ (Solidity, Rust, etc.).",
+        "Desplegar: queda almacenado en la blockchain, sin posibilidad de alteración simple.",
+        "Ejecutar: se activa al cumplirse las condiciones; resultado verificable por la red."
+      ]
+    },
+
+    {
+      h3: "6.5 Ventajas y aplicaciones de los contratos inteligentes",
+      p: [
+        "El salto conceptual: pasas de ‘contratos que alguien aplica’ a ‘contratos que se ejecutan solos’.",
+        "Esto habilita ecosistemas completos: DeFi, NFTs, DAOs, seguros automatizados y trazabilidad industrial."
+      ],
+      ul: [
+        "Ventajas: transparencia, eliminación de intermediarios, inmutabilidad, eficiencia/velocidad.",
+        "DeFi: préstamos (Aave/Compound), DEX (Uniswap/SushiSwap), staking y rendimientos.",
+        "NFTs: propiedad/derechos digitales (arte, coleccionables) con transferencia automática.",
+        "DAOs: gobernanza y votación con ejecución automática de decisiones.",
+        "Seguros: pagos automáticos (p.ej., evento verificado por sensores/IoT).",
+        "Logística: trazabilidad y autenticidad (p.ej., seguimiento de lotes)."
+      ]
+    },
+
+    {
+      h3: "6.6 Desafíos y limitaciones de los contratos inteligentes",
+      p: [
+        "La automatización trae un precio: si el código está mal, el sistema ejecuta el error con ‘disciplina matemática’.",
+        "Por eso se habla tanto de auditorías, gas fees y barreras de integración con sistemas existentes."
+      ],
+      ul: [
+        "Seguridad y bugs: un fallo puede ser catastrófico; ejemplo clásico: The DAO (2016).",
+        "Coste de ejecución (gas): puede ser alto con congestión en Ethereum.",
+        "Integración: muchas industrias siguen atadas a bases de datos centralizadas."
+      ]
+    },
+
+    {
+      h3: "6.7 Gestión de documentos oficiales: por qué blockchain encaja",
+      p: [
+        "Los documentos oficiales (gobiernos, universidades, justicia, empresas) suelen estar en sistemas centralizados o físicos: son vulnerables a fraude, pérdidas, alteraciones y burocracia.",
+        "Blockchain aporta inmutabilidad y verificabilidad para emisión, almacenamiento y validación de registros."
+      ],
+      ul: [
+        "Registros inmutables: no se altera ni elimina una vez registrado.",
+        "Verificación descentralizada: validar sin contactar con la entidad emisora.",
+        "Antifraude: una alteración cambia el hash y deja evidencia inmediata."
+      ]
+    },
+
+    {
+      h3: "6.8 Casos de uso (documentos e identidad digital)",
+      p: [
+        "Aquí blockchain se vuelve ‘infraestructura’: no es especulación, es administración de evidencias y derechos.",
+        "El foco es autenticidad + acceso + reducción de intermediarios."
+      ],
+      ul: [
+        "Registro civil: nacimiento/matrimonio/defunción (ejemplo: Estonia en identidad digital).",
+        "Títulos académicos: diplomas verificables (ejemplo: MIT).",
+        "Registro de propiedad: títulos inmutables y transferencias más eficientes (ej.: Suecia y Georgia).",
+        "Contratos y licencias: automatización/verificación transparente (permisos, contratos laborales, patentes)."
+      ]
+    },
+
+    {
+      h3: "6.9 Beneficios y desafíos en gestión documental (GDPR incluido)",
+      p: [
+        "Los beneficios son claros: menos fraude y menos burocracia. Pero aparecen fricciones: regulación, migración tecnológica y privacidad.",
+        "La solución realista a menudo pasa por modelos privados o híbridos cuando hay datos sensibles."
+      ],
+      ul: [
+        "Beneficios: reducción del fraude, ahorro de costes/burocracia, accesibilidad global, control del usuario sobre permisos.",
+        "Retos: regulación y adopción gubernamental, integración con sistemas tradicionales, privacidad y protección de datos (GDPR → privadas/híbridas)."
+      ]
+    },
+
+    {
+      h3: "6.10 Mini-ejemplo rápido (para clase y práctica)",
+      p: [
+        "La idea no es ‘ser programador blockchain’, sino entender el modelo mental: lógica automática + ejecución verificable.",
+        "Este ejemplo ilustra un pago automático muy simple (concepto)."
+      ],
+      code:
+`// Ejemplo conceptual (Solidity) — Pago automático
+pragma solidity ^0.8.0;
+
+contract PagoAutomatico {
+  address payable public receptor;
+  uint public monto;
+
+  constructor(address payable _receptor, uint _monto) {
+    receptor = _receptor;
+    monto = _monto;
+  }
+
+  function liberarPago() public {
+    receptor.transfer(monto);
+  }
+}
+
+// Idea clave:
+// - Si está desplegado, el contrato ejecuta reglas.
+// - No hay notario/banco verificando: la red valida y registra.`
+    }
+  ],
+
+  extras: [
+    {
+      title: "Resultados de aprendizaje (qué deberían dominar)",
+      p: [
+        "Comprender cómo funcionan Bitcoin y Ethereum y su impacto en la economía digital.",
+        "Explicar contratos inteligentes, sus aplicaciones (DeFi/NFT/DAO) y sus limitaciones (bugs, gas, integración).",
+        "Analizar cómo blockchain transforma la gestión documental (seguridad, eficiencia, accesibilidad) y el control del usuario.",
+        "Evaluar casos de uso reales (incluyendo implicaciones legales, privacidad y viabilidad de implementación).",
+        "Identificar oportunidades donde blockchain aporta valor y reconocer barreras reales de adopción."
+      ]
+    },
+    {
+      title: "Idea de práctica para enlazar con tu web (HTML5)",
+      p: [
+        "Actividad sugerida A (Smart Contracts): diseñar un ‘contrato’ en pseudocódigo (si-entonces) para un caso real (seguro paramétrico, apuesta, licencia) y listar riesgos (bugs, gas, oráculos, integración).",
+        "Actividad sugerida B (Documentos): diseñar un sistema de verificación de documentos con hash + registro (qué se guarda on-chain vs off-chain), y decidir si usarías blockchain pública, privada o híbrida por GDPR."
+      ]
+    }
+  ]
+},
 
 //------------------------------------------------------------------------------------------------------------------------------
 //
