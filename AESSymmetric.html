@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Unidad 3 · AES Symmetric Lab (AES-GCM)</title>
+  <style>
+    :root{
+      --bg:#0b1020; --panel:#101a33; --panel2:#0f1730;
+      --text:#e7ecff; --muted:#a8b3da; --border:rgba(255,255,255,.10);
+      --accent:#7c5cff; --accent2:#2ee59d; --danger:#ff4d6d;
+      --shadow: 0 18px 50px rgba(0,0,0,.45);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
+    }
+    [data-theme="light"]{
+      --bg:#f6f7ff; --panel:#ffffff; --panel2:#f3f4ff;
+      --text:#11142a; --muted:#4f5b86; --border:rgba(15,20,42,.12);
+      --shadow: 0 18px 50px rgba(15,20,42,.12);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:var(--sans);
+      background: radial-gradient(900px 500px at 18% 12%, rgba(124,92,255,.25), transparent 55%),
+                  radial-gradient(700px 450px at 85% 20%, rgba(46,229,157,.18), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      display:flex; align-items:center; justify-content:center;
+      padding:28px;
+    }
+    .app{
+      width:min(1180px, 100%);
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:18px;
+    }
+    header{
+      grid-column:1 / -1;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px;
+      padding:18px 18px 0;
+    }
+    .title{display:flex; flex-direction:column; gap:2px}
+    .title h1{margin:0; font-size:20px; letter-spacing:.2px}
+    .title p{margin:0; color:var(--muted); font-size:13px}
+
+    .toggle{
+      display:flex; align-items:center; gap:10px;
+      padding:10px 12px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background: rgba(255,255,255,.04);
+      backdrop-filter: blur(6px);
+      box-shadow: var(--shadow);
+    }
+    .btn{
+      cursor:pointer;
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      transition: transform .08s ease, border-color .2s ease;
+      font-weight:700;
+      letter-spacing:.1px;
+    }
+    .btn:active{transform: scale(.98)}
+    .btn.primary{
+      border-color: rgba(124,92,255,.55);
+      box-shadow: 0 12px 40px rgba(124,92,255,.22);
+    }
+    .btn.good{
+      border-color: rgba(46,229,157,.55);
+      box-shadow: 0 12px 40px rgba(46,229,157,.18);
+    }
+    .btn.danger{
+      border-color: rgba(255,77,109,.55);
+      box-shadow: 0 12px 40px rgba(255,77,109,.16);
+    }
+
+    .card{
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border-radius:18px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:14px 16px;
+      border-bottom:1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px;
+    }
+    .card .hd h2{margin:0; font-size:14px; letter-spacing:.2px}
+    .card .bd{padding:16px}
+
+    .grid{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px}
+    input[type="text"], input[type="password"], input[type="number"], textarea{
+      width:100%;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background: var(--panel2);
+      color:var(--text);
+      padding:12px 12px;
+      font-size:13px;
+      outline:none;
+    }
+    textarea{min-height:170px; resize:vertical; line-height:1.35}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .row > *{flex:0 0 auto}
+    .muted{color:var(--muted); font-size:12px}
+
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:12px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      color:var(--text);
+      user-select:none;
+    }
+    .dot{width:10px; height:10px; border-radius:999px; background: var(--muted)}
+    .dot.ok{background: var(--accent2)}
+    .dot.bad{background: var(--danger)}
+
+    .box{
+      font-family: var(--mono);
+      font-size: 12px;
+      word-break: break-all;
+      padding:12px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background: var(--panel2);
+      line-height:1.35;
+    }
+    .smallcode{
+      font-family: var(--mono);
+      font-size: 12px;
+      color:var(--muted);
+      background: rgba(255,255,255,.03);
+      border:1px solid var(--border);
+      padding:10px 12px;
+      border-radius:14px;
+      line-height:1.4;
+      white-space: pre-wrap;
+    }
+    .kpi{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      margin-top:12px;
+    }
+    .kpi .tile{
+      border:1px solid var(--border);
+      border-radius:16px;
+      background: rgba(255,255,255,.03);
+      padding:12px;
+    }
+    .kpi .tile .v{font-size:18px; font-weight:900; letter-spacing:.2px}
+    .kpi .tile .l{font-size:12px; color:var(--muted); margin-top:2px}
+
+    @media (max-width: 980px){
+      .app{grid-template-columns:1fr}
+      .grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+
+<body data-theme="dark">
+  <div class="app">
+    <header>
+      <div class="title">
+        <h1>Unidad 3 · AES Symmetric Lab (AES-GCM)</h1>
+        <p>Cifra y descifra con clave secreta. Observa IV, salt y detección de manipulación (GCM).</p>
+      </div>
+      <div class="toggle">
+        <span class="muted">Tema</span>
+        <button class="btn" id="themeBtn" title="Cambiar dark/light">🌙 / ☀️</button>
+      </div>
+    </header>
+
+    <!-- IZQUIERDA: Entrada -->
+    <section class="card">
+      <div class="hd">
+        <h2>Entrada (texto + clave)</h2>
+        <div class="row">
+          <button class="btn primary" id="encryptBtn">Cifrar (AES-GCM)</button>
+          <button class="btn good" id="decryptBtn">Descifrar</button>
+          <button class="btn danger" id="resetBtn">Reset</button>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="grid">
+          <div>
+            <label>Passphrase (se deriva clave con PBKDF2)</label>
+            <input type="password" id="passphrase" value="ClaveSecretaSuper" />
+            <div class="muted" style="margin-top:6px">
+              Nota: en sistemas reales se usan gestores de claves o KMS; aquí simulamos derivación.
+            </div>
+          </div>
+          <div>
+            <label>Iteraciones PBKDF2</label>
+            <input type="number" id="iterations" min="10000" step="10000" value="150000" />
+            <div class="muted" style="margin-top:6px">Más iteraciones → más coste contra fuerza bruta.</div>
+          </div>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <label>Texto plano (plaintext)</label>
+        <textarea id="plaintext" spellcheck="false">Este mensaje es confidencial. Con AES-GCM, el contenido se protege y además se detecta si alguien lo manipula.</textarea>
+
+        <div style="height:12px"></div>
+
+        <div class="row">
+          <span class="pill" title="Datos asociados autenticados (AAD). No se cifran, pero se autentican.">
+            <span class="dot" id="aadDot"></span>
+            <span>Usar AAD</span>
+            <input type="checkbox" id="aadToggle" style="margin-left:6px; transform: translateY(1px);" />
+          </span>
+          <input type="text" id="aad" value="header:v1|course:unit3" style="flex:1 1 auto; min-width:260px" disabled />
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div class="muted">Qué demuestra esta app:</div>
+        <div class="smallcode">
+• AES (simétrico) = reversible: con la clave correcta recuperas el mensaje.
+• AES-GCM = cifrado + autenticación: si cambias 1 bit del ciphertext, el descifrado falla.
+• IV (nonce) debe ser único por mensaje; salt e iteraciones ayudan contra diccionario si partes de passphrase.
+        </div>
+      </div>
+    </section>
+
+    <!-- DERECHA: Salida -->
+    <aside class="card">
+      <div class="hd">
+        <h2>Salida (paquete cifrado + verificación)</h2>
+        <span class="pill" id="statusPill">
+          <span class="dot" id="statusDot"></span>
+          <span id="statusText">Listo</span>
+        </span>
+      </div>
+      <div class="bd">
+        <div class="row" style="justify-content:space-between">
+          <div class="muted">Paquete cifrado (JSON):</div>
+          <div class="row">
+            <button class="btn" id="copyBtn">Copiar</button>
+            <button class="btn" id="pasteBtn">Pegar</button>
+            <button class="btn danger" id="tamperBtn" title="Modifica 1 byte del ciphertext para demostrar integridad">Tamper</button>
+          </div>
+        </div>
+        <div style="height:8px"></div>
+        <textarea id="package" spellcheck="false" style="min-height:210px; font-family:var(--mono); font-size:12px;">—</textarea>
+
+        <div class="kpi">
+          <div class="tile">
+            <div class="v" id="kpiMode">AES-GCM</div>
+            <div class="l">Modo</div>
+          </div>
+          <div class="tile">
+            <div class="v" id="kpiIv">—</div>
+            <div class="l">IV (bytes)</div>
+          </div>
+          <div class="tile">
+            <div class="v" id="kpiSalt">—</div>
+            <div class="l">Salt (bytes)</div>
+          </div>
+          <div class="tile">
+            <div class="v" id="kpiSize">—</div>
+            <div class="l">Ciphertext (bytes)</div>
+          </div>
+        </div>
+
+        <div style="height:14px"></div>
+
+        <div class="muted">Resultado del descifrado:</div>
+        <div class="box" id="decrypted">—</div>
+
+        <div style="height:12px"></div>
+
+        <div class="muted">Detalle técnico (para discusión):</div>
+        <div class="smallcode" id="techBox">—</div>
+      </div>
+    </aside>
+  </div>
+
+<script>
+  // ---------- DOM ----------
+  const $ = (id) => document.getElementById(id);
+
+  // ---------- Theme ----------
+  $("themeBtn").addEventListener("click", () => {
+    const body = document.body;
+    const isDark = body.getAttribute("data-theme") === "dark";
+    body.setAttribute("data-theme", isDark ? "light" : "dark");
+  });
+
+  // ---------- Status ----------
+  function setStatus(type, text){
+    const dot = $("statusDot");
+    dot.classList.remove("ok","bad");
+    if (type === "ok") dot.classList.add("ok");
+    if (type === "bad") dot.classList.add("bad");
+    $("statusText").textContent = text;
+  }
+
+  // ---------- Encoding helpers ----------
+  const te = new TextEncoder();
+  const td = new TextDecoder();
+
+  function b64enc(u8){
+    let s = "";
+    for (const b of u8) s += String.fromCharCode(b);
+    return btoa(s);
+  }
+  function b64dec(b64){
+    const bin = atob(b64);
+    const u8 = new Uint8Array(bin.length);
+    for (let i=0;i<bin.length;i++) u8[i] = bin.charCodeAt(i);
+    return u8;
+  }
+  function randBytes(n){
+    const a = new Uint8Array(n);
+    crypto.getRandomValues(a);
+    return a;
+  }
+
+  // ---------- PBKDF2 -> AES key ----------
+  async function deriveAesKeyFromPassphrase(passphrase, saltU8, iterations){
+    const passKey = await crypto.subtle.importKey(
+      "raw",
+      te.encode(passphrase),
+      "PBKDF2",
+      false,
+      ["deriveKey"]
+    );
+
+    return crypto.subtle.deriveKey(
+      {
+        name: "PBKDF2",
+        salt: saltU8,
+        iterations: iterations,
+        hash: "SHA-256"
+      },
+      passKey,
+      { name: "AES-GCM", length: 256 },
+      false,
+      ["encrypt","decrypt"]
+    );
+  }
+
+  // ---------- AES-GCM encrypt/decrypt ----------
+  async function encryptAesGcm(plaintext, passphrase, iterations, aadStr){
+    const iv = randBytes(12);          // recomendado 96-bit
+    const salt = randBytes(16);        // para PBKDF2
+    const key = await deriveAesKeyFromPassphrase(passphrase, salt, iterations);
+
+    const alg = { name:"AES-GCM", iv };
+    if (aadStr && aadStr.length){
+      alg.additionalData = te.encode(aadStr);
+      alg.tagLength = 128;
+    } else {
+      alg.tagLength = 128;
+    }
+
+    const pt = te.encode(plaintext);
+    const ctBuf = await crypto.subtle.encrypt(alg, key, pt);
+    const ct = new Uint8Array(ctBuf);
+
+    // WebCrypto devuelve ciphertext + tag al final (tagLength/8 bytes)
+    // Para el alumno es suficiente saber que "viaja junto".
+    const pkg = {
+      v: 1,
+      alg: "AES-GCM",
+      kdf: "PBKDF2-SHA256",
+      iter: iterations,
+      salt_b64: b64enc(salt),
+      iv_b64: b64enc(iv),
+      aad: aadStr || "",
+      ct_b64: b64enc(ct)
+    };
+
+    return { pkg, iv, salt, ctBytes: ct.length };
+  }
+
+  async function decryptAesGcm(pkg, passphrase){
+    const iterations = Number(pkg.iter);
+    const salt = b64dec(pkg.salt_b64);
+    const iv = b64dec(pkg.iv_b64);
+    const ct = b64dec(pkg.ct_b64);
+    const aadStr = pkg.aad || "";
+
+    const key = await deriveAesKeyFromPassphrase(passphrase, salt, iterations);
+
+    const alg = { name:"AES-GCM", iv, tagLength: 128 };
+    if (aadStr && aadStr.length){
+      alg.additionalData = te.encode(aadStr);
+    }
+
+    const ptBuf = await crypto.subtle.decrypt(alg, key, ct);
+    return td.decode(ptBuf);
+  }
+
+  // ---------- UI logic ----------
+  function updateKPIs(ivBytes, saltBytes, ctBytes){
+    $("kpiIv").textContent = ivBytes ? String(ivBytes) : "—";
+    $("kpiSalt").textContent = saltBytes ? String(saltBytes) : "—";
+    $("kpiSize").textContent = ctBytes ? String(ctBytes) : "—";
+  }
+
+  function setTech(text){ $("techBox").textContent = text; }
+
+  const aadToggle = $("aadToggle");
+  const aadInput = $("aad");
+  const aadDot = $("aadDot");
+  aadToggle.addEventListener("change", ()=>{
+    aadInput.disabled = !aadToggle.checked;
+    aadDot.classList.toggle("ok", aadToggle.checked);
+  });
+
+  $("encryptBtn").addEventListener("click", async ()=>{
+    try{
+      const pass = $("passphrase").value;
+      const it = Number($("iterations").value);
+      if (!pass || pass.length < 4){
+        setStatus("bad","Passphrase demasiado corta");
+        return;
+      }
+      if (!Number.isFinite(it) || it < 10000){
+        setStatus("bad","Iteraciones inválidas (mín 10000)");
+        return;
+      }
+
+      const aad = aadToggle.checked ? aadInput.value : "";
+      const { pkg, iv, salt, ctBytes } = await encryptAesGcm($("plaintext").value, pass, it, aad);
+
+      $("package").value = JSON.stringify(pkg, null, 2);
+      $("decrypted").textContent = "—";
+      updateKPIs(iv.length, salt.length, ctBytes);
+
+      setTech(
+`Derivación de clave:
+- KDF: PBKDF2 con SHA-256
+- Salt: ${salt.length} bytes (aleatorio)
+- Iteraciones: ${it}
+
+Cifrado:
+- Algoritmo: AES-GCM (256-bit key)
+- IV/Nonce: ${iv.length} bytes (debe ser único por mensaje)
+- AAD: ${aad ? "sí (autenticado, no cifrado)" : "no"}
+- Tag: 128 bits (integridad/autenticación)`
+      );
+
+      setStatus("ok","Cifrado OK");
+    } catch(e){
+      setStatus("bad","Error cifrando");
+      $("package").value = "Error: " + e.message;
+    }
+  });
+
+  $("decryptBtn").addEventListener("click", async ()=>{
+    try{
+      const pass = $("passphrase").value;
+      const raw = $("package").value.trim();
+      if (!raw || raw === "—"){
+        setStatus("bad","No hay paquete");
+        return;
+      }
+      const pkg = JSON.parse(raw);
+      const pt = await decryptAesGcm(pkg, pass);
+      $("decrypted").textContent = pt;
+      setStatus("ok","Descifrado OK (integridad verificada)");
+    } catch(e){
+      // AES-GCM falla aquí si el ciphertext/tag/AAD/IV no encajan
+      $("decrypted").textContent = "—";
+      setStatus("bad","Descifrado FALLA (clave incorrecta o datos manipulados)");
+    }
+  });
+
+  $("tamperBtn").addEventListener("click", ()=>{
+    try{
+      const raw = $("package").value.trim();
+      if (!raw || raw === "—") { setStatus("bad","No hay paquete"); return; }
+      const pkg = JSON.parse(raw);
+      const ct = b64dec(pkg.ct_b64);
+      if (ct.length < 2) { setStatus("bad","Ciphertext demasiado corto"); return; }
+      // flip 1 bit de un byte "a mitad"
+      const i = Math.floor(ct.length / 2);
+      ct[i] ^= 0x01;
+      pkg.ct_b64 = b64enc(ct);
+      $("package").value = JSON.stringify(pkg, null, 2);
+      $("decrypted").textContent = "—";
+      setStatus("bad","Paquete manipulado: ahora el descifrado debe fallar");
+    } catch(e){
+      setStatus("bad","No se pudo manipular (JSON inválido)");
+    }
+  });
+
+  $("copyBtn").addEventListener("click", async ()=>{
+    try{
+      await navigator.clipboard.writeText($("package").value);
+      setStatus("ok","Copiado al portapapeles");
+    } catch(e){
+      setStatus("bad","No se pudo copiar (permiso del navegador)");
+    }
+  });
+
+  $("pasteBtn").addEventListener("click", async ()=>{
+    try{
+      const t = await navigator.clipboard.readText();
+      if (t && t.trim().length){
+        $("package").value = t.trim();
+        setStatus("ok","Pegado desde portapapeles");
+      } else setStatus("bad","Portapapeles vacío");
+    } catch(e){
+      setStatus("bad","No se pudo pegar (permiso del navegador)");
+    }
+  });
+
+  $("resetBtn").addEventListener("click", ()=>{
+    $("plaintext").value = "Este mensaje es confidencial. Con AES-GCM, el contenido se protege y además se detecta si alguien lo manipula.";
+    $("package").value = "—";
+    $("decrypted").textContent = "—";
+    $("iterations").value = "150000";
+    aadToggle.checked = false;
+    aadInput.disabled = true;
+    aadInput.value = "header:v1|course:unit3";
+    aadDot.classList.remove("ok");
+    updateKPIs(null,null,null);
+    setTech("—");
+    setStatus("ok","Listo");
+  });
+
+  // Init
+  setStatus("ok","Listo");
+  setTech("Pulsa “Cifrar” para generar el paquete (salt + IV + ciphertext). Luego “Descifrar”. Prueba “Tamper” para ver la integridad de GCM.");
+</script>
+</body>
+</html>
