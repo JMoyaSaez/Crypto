@@ -64,29 +64,19 @@
       padding: 0;
     }
 
-    body {
-      min-height: 100vh;
-      font-family: var(--font-main);
-      background: var(--bg);
-      color: var(--text);
-      padding: 1.5rem;
-      display: flex;
-      justify-content: center;
-      transition: background 0.4s ease, color 0.2s ease;
-    }
+    body{
+  min-height: 100vh;
+  font-family: var(--font-main);
+  background: var(--bg);
+  color: var(--text);
+  padding: 1.5rem;
+}
 
-    .shell {
-      width: 100%;
-      max-width: 1120px;
-      background: radial-gradient(circle at top, var(--hero-glow), transparent 55%);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border-soft);
-      box-shadow:
-        0 30px 80px rgba(15, 23, 42, 0.75),
-        0 0 0 1px rgba(15, 23, 42, 0.9);
-      overflow: hidden;
-      position: relative;
-    }
+.shell{
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;  /* centra */
+}
 
     .shell::before {
       content: "";
