@@ -64,31 +64,34 @@
       padding: 0;
     }
 
+html, body {
+  height: auto;
+}
+
 body {
   min-height: 100vh;
+  margin: 0;
   font-family: var(--font-main);
   background: var(--bg);
   color: var(--text);
   padding: 1.5rem;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start; /* <- CLAVE: evita el stretch vertical */
-  transition: background 0.4s ease, color 0.2s ease;
+  overflow-y: auto;   /* fuerza scroll si hace falta */
 }
 
-.shell::before {
-      content: "";
-      position: absolute;
-      top: -80px;
-      right: -80px;
-      width: 200px;
-      height: 200px;
-      border-radius: 50%;
-      background: radial-gradient(circle, var(--hero-glow), transparent 70%);
-      filter: blur(2px);
-      pointer-events: none;
-      opacity: 0.9;
-    }    
+/* RECUPERA ESTO (lo has perdido en el pegado) */
+.shell {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;           /* centra horizontal */
+  background: radial-gradient(circle at top, var(--hero-glow), transparent 55%);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-soft);
+  box-shadow:
+    0 30px 80px rgba(15, 23, 42, 0.75),
+    0 0 0 1px rgba(15, 23, 42, 0.9);
+  overflow: hidden;          /* ok para recortar el glow */
+  position: relative;        /* CLAVE para .shell::before */
+}  
 
     .inner {
       position: relative;
