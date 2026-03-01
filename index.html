@@ -76,7 +76,19 @@ body {
   transition: background 0.4s ease, color 0.2s ease;
 }
 
-    
+.shell::before {
+      content: "";
+      position: absolute;
+      top: -80px;
+      right: -80px;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--hero-glow), transparent 70%);
+      filter: blur(2px);
+      pointer-events: none;
+      opacity: 0.9;
+    }    
 
     .inner {
       position: relative;
