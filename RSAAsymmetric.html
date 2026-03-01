@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unidad 4 · RSA Asymmetric Lab</title>
+
+<style>
+:root{
+  --bg:#0f1428;
+  --panel:#161d3a;
+  --text:#e9ecff;
+  --muted:#9aa6d1;
+  --border:rgba(255,255,255,.08);
+  --accent:#6c63ff;
+  --ok:#2ee59d;
+  --bad:#ff4d6d;
+  --mono: ui-monospace, Consolas, monospace;
+}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:system-ui;
+  padding:30px;
+}
+h1{margin-top:0}
+.card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:20px;
+  margin-bottom:20px;
+}
+textarea{
+  width:100%;
+  min-height:120px;
+  background:#0d1330;
+  color:var(--text);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:12px;
+  font-family:var(--mono);
+}
+button{
+  background:var(--accent);
+  border:none;
+  padding:10px 16px;
+  border-radius:10px;
+  color:white;
+  cursor:pointer;
+  margin:5px 5px 5px 0;
+  font-weight:bold;
+}
+button.secondary{
+  background:#3a4270;
+}
+button.danger{
+  background:var(--bad);
+}
+.status{
+  font-weight:bold;
+}
+.ok{color:var(--ok)}
+.bad{color:var(--bad)}
+.muted{color:var(--muted); font-size:13px}
+</style>
+</head>
+
+<body>
+
+<h1>Unidad 4 · RSA Asymmetric Lab</h1>
+<p class="muted">Genera claves RSA, cifra con clave pública, descifra con privada y experimenta con firma digital.</p>
+
+<div class="card">
+<h3>1️⃣ Generación de claves</h3>
+<button id="genKeys">Generar par de claves RSA (2048 bits)</button>
+<p id="keyStatus" class="status"></p>
+</div>
+
+<div class="card">
+<h3>2️⃣ Cifrado / Descifrado (RSA-OAEP)</h3>
+
+<label>Mensaje:</label>
+<textarea id="message">Este mensaje será cifrado con clave pública.</textarea>
+
+<button id="encrypt">Cifrar con clave pública</button>
+<button id="decrypt" class="secondary">Descifrar con clave privada</button>
+
+<label>Ciphertext (Base64):</label>
+<textarea id="ciphertext"></textarea>
+
+<p id="cryptoStatus" class="status"></p>
+</div>
+
+<div class="card">
+<h3>3️⃣ Firma digital (RSA-PSS)</h3>
+
+<button id="sign">Firmar con clave privada</button>
+<button id="verify" class="secondary">Verificar firma con clave pública</button>
+<button id="tamper" class="danger">Manipular mensaje</button>
+
+<label>Firma (Base64):</label>
+<textarea id="signature"></textarea>
+
+<p id="signStatus" class="status"></p>
+</div>
+
+<script>
+let publicKey, privateKey;
+
+const enc = new TextEncoder();
+const dec = new TextDecoder();
+
+function toBase64(buffer){
+  return btoa(String.fromCharCode(...new Uint8Array(buffer)));
+}
+function fromBase64(str){
+  return Uint8Array.from(atob(str), c => c.charCodeAt(0));
+}
+
+document.getElementById("genKeys").onclick = async () => {
+  const keyPair = await crypto.subtle.generateKey(
+    {
+      name: "RSA-OAEP",
+      modulusLength: 2048,
+      publicExponent: new Uint8Array([1,0,1]),
+      hash: "SHA-256"
+    },
+    true,
+    ["encrypt","decrypt"]
+  );
+  publicKey = keyPair.publicKey;
+  privateKey = keyPair.privateKey;
+  document.getElementById("keyStatus").textContent = "Claves generadas correctamente.";
+};
+
+document.getElementById("encrypt").onclick = async () => {
+  try{
+    const msg = enc.encode(document.getElementById("message").value);
+    const cipher = await crypto.subtle.encrypt(
+      {name:"RSA-OAEP"},
+      publicKey,
+      msg
+    );
+    document.getElementById("ciphertext").value = toBase64(cipher);
+    document.getElementById("cryptoStatus").textContent = "Mensaje cifrado con clave pública.";
+  }catch(e){
+    document.getElementById("cryptoStatus").textContent = "Error cifrando.";
+  }
+};
+
+document.getElementById("decrypt").onclick = async () => {
+  try{
+    const cipher = fromBase64(document.getElementById("ciphertext").value);
+    const plain = await crypto.subtle.decrypt(
+      {name:"RSA-OAEP"},
+      privateKey,
+      cipher
+    );
+    document.getElementById("message").value = dec.decode(plain);
+    document.getElementById("cryptoStatus").textContent = "Descifrado con clave privada.";
+  }catch(e){
+    document.getElementById("cryptoStatus").textContent = "Error descifrando.";
+  }
+};
+
+document.getElementById("sign").onclick = async () => {
+  const keyPair = await crypto.subtle.generateKey(
+    {
+      name: "RSA-PSS",
+      modulusLength: 2048,
+      publicExponent: new Uint8Array([1,0,1]),
+      hash: "SHA-256"
+    },
+    true,
+    ["sign","verify"]
+  );
+  publicKey = keyPair.publicKey;
+  privateKey = keyPair.privateKey;
+
+  const msg = enc.encode(document.getElementById("message").value);
+  const signature = await crypto.subtle.sign(
+    {name:"RSA-PSS", saltLength:32},
+    privateKey,
+    msg
+  );
+  document.getElementById("signature").value = toBase64(signature);
+  document.getElementById("signStatus").textContent = "Mensaje firmado con clave privada.";
+};
+
+document.getElementById("verify").onclick = async () => {
+  try{
+    const msg = enc.encode(document.getElementById("message").value);
+    const signature = fromBase64(document.getElementById("signature").value);
+    const valid = await crypto.subtle.verify(
+      {name:"RSA-PSS", saltLength:32},
+      publicKey,
+      signature,
+      msg
+    );
+    if(valid){
+      document.getElementById("signStatus").textContent = "Firma válida.";
+      document.getElementById("signStatus").className="status ok";
+    }else{
+      document.getElementById("signStatus").textContent = "Firma inválida.";
+      document.getElementById("signStatus").className="status bad";
+    }
+  }catch(e){
+    document.getElementById("signStatus").textContent = "Error verificando.";
+  }
+};
+
+document.getElementById("tamper").onclick = () => {
+  document.getElementById("message").value += " (modificado)";
+  document.getElementById("signStatus").textContent = "Mensaje modificado.";
+};
+</script>
+
+</body>
+</html>
