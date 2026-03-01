@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Unidad 5 · Mini Blockchain Visual Lab</title>
+  <style>
+    :root{
+      --bg:#0b1020; --panel:#101a33; --panel2:#0f1730;
+      --text:#e7ecff; --muted:#a8b3da; --border:rgba(255,255,255,.10);
+      --accent:#7c5cff; --ok:#2ee59d; --bad:#ff4d6d; --warn:#ffcc66;
+      --shadow: 0 18px 50px rgba(0,0,0,.45);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
+    }
+    [data-theme="light"]{
+      --bg:#f6f7ff; --panel:#ffffff; --panel2:#f3f4ff;
+      --text:#11142a; --muted:#4f5b86; --border:rgba(15,20,42,.12);
+      --shadow: 0 18px 50px rgba(15,20,42,.12);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:var(--sans);
+      background: radial-gradient(900px 500px at 18% 12%, rgba(124,92,255,.25), transparent 55%),
+                  radial-gradient(700px 450px at 85% 20%, rgba(46,229,157,.18), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      display:flex; align-items:center; justify-content:center;
+      padding:28px;
+    }
+    .app{
+      width:min(1220px, 100%);
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:18px;
+    }
+    header{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px;
+      padding:8px 2px 0;
+    }
+    .title{display:flex; flex-direction:column; gap:2px}
+    .title h1{margin:0; font-size:20px; letter-spacing:.2px}
+    .title p{margin:0; color:var(--muted); font-size:13px}
+
+    .toggle{
+      display:flex; align-items:center; gap:10px;
+      padding:10px 12px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background: rgba(255,255,255,.04);
+      backdrop-filter: blur(6px);
+      box-shadow: var(--shadow);
+    }
+
+    .btn{
+      cursor:pointer;
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      transition: transform .08s ease, border-color .2s ease;
+      font-weight:800;
+      letter-spacing:.1px;
+    }
+    .btn:active{transform:scale(.98)}
+    .btn.primary{border-color: rgba(124,92,255,.55); box-shadow: 0 12px 40px rgba(124,92,255,.22);}
+    .btn.good{border-color: rgba(46,229,157,.55); box-shadow: 0 12px 40px rgba(46,229,157,.18);}
+    .btn.danger{border-color: rgba(255,77,109,.55); box-shadow: 0 12px 40px rgba(255,77,109,.16);}
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap:18px;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    .card{
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border-radius:18px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:14px 16px;
+      border-bottom:1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px;
+    }
+    .card .hd h2{margin:0; font-size:14px; letter-spacing:.2px}
+    .card .bd{padding:16px}
+
+    label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px}
+    input[type="text"], input[type="number"], textarea{
+      width:100%;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background: var(--panel2);
+      color:var(--text);
+      padding:12px 12px;
+      font-size:13px;
+      outline:none;
+    }
+    textarea{min-height:120px; resize:vertical; line-height:1.35}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .row > *{flex:0 0 auto}
+    .muted{color:var(--muted); font-size:12px}
+
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:12px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      user-select:none;
+    }
+    .dot{width:10px; height:10px; border-radius:999px; background: var(--muted)}
+    .dot.ok{background: var(--ok)}
+    .dot.bad{background: var(--bad)}
+    .dot.warn{background: var(--warn)}
+
+    .small{
+      font-family:var(--mono);
+      font-size:12px;
+      color:var(--muted);
+      background: rgba(255,255,255,.03);
+      border:1px solid var(--border);
+      padding:10px 12px;
+      border-radius:14px;
+      white-space: pre-wrap;
+      line-height:1.4;
+    }
+
+    .chain{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      max-height: 640px;
+      overflow:auto;
+      padding-right:4px;
+    }
+
+    .block{
+      border:1px solid var(--border);
+      border-radius:18px;
+      background: rgba(255,255,255,.03);
+      padding:12px;
+      position:relative;
+    }
+    .block.valid{
+      border-color: rgba(46,229,157,.45);
+      box-shadow: 0 10px 30px rgba(46,229,157,.10);
+    }
+    .block.invalid{
+      border-color: rgba(255,77,109,.55);
+      box-shadow: 0 10px 30px rgba(255,77,109,.10);
+    }
+    .block .top{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      margin-bottom:10px;
+    }
+    .block .top .left{
+      display:flex; flex-direction:column; gap:2px;
+    }
+    .block .idx{
+      font-weight:900; letter-spacing:.2px;
+    }
+    .block .meta{
+      font-size:12px; color:var(--muted);
+      font-family:var(--mono);
+    }
+
+    .kv{
+      display:grid;
+      grid-template-columns: 120px 1fr;
+      gap:8px 10px;
+      font-family:var(--mono);
+      font-size:12px;
+      color:var(--text);
+    }
+    .k{color:var(--muted)}
+    .v{word-break: break-all; line-height:1.35}
+    .v.mono{font-family:var(--mono)}
+    .btns{display:flex; gap:8px; flex-wrap:wrap}
+
+    .arrow{
+      height:10px;
+      margin:2px 0 0 10px;
+      border-left:2px dashed rgba(124,92,255,.45);
+      border-bottom:2px dashed rgba(124,92,255,.45);
+      width:26px;
+      border-bottom-left-radius:10px;
+      opacity:.85;
+    }
+  </style>
+</head>
+
+<body data-theme="dark">
+  <div class="app">
+    <header>
+      <div class="title">
+        <h1>Unidad 5 · Mini Blockchain Visual Lab</h1>
+        <p>Construye bloques, mina con Proof-of-Work y comprueba por qué “cambiar un bloque rompe toda la cadena”.</p>
+      </div>
+      <div class="toggle">
+        <span class="muted">Tema</span>
+        <button class="btn" id="themeBtn" title="Cambiar dark/light">🌙 / ☀️</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- CONTROLES -->
+      <section class="card">
+        <div class="hd">
+          <h2>Controles · Transacciones · Minado</h2>
+          <span class="pill" id="statusPill">
+            <span class="dot ok" id="statusDot"></span>
+            <span id="statusText">Listo</span>
+          </span>
+        </div>
+        <div class="bd">
+          <label>Transacción (lo que “metemos” en un bloque)</label>
+          <textarea id="tx" spellcheck="false">Alice → Bob : 10 coins</textarea>
+
+          <div style="height:12px"></div>
+
+          <div class="row">
+            <div style="flex:1 1 auto; min-width:220px">
+              <label>Dificultad PoW (nº de ceros iniciales)</label>
+              <input type="number" id="difficulty" min="1" max="6" value="3" />
+              <div class="muted" style="margin-top:6px">Tip: 2–4 va bien en clase. 5–6 puede tardar.</div>
+            </div>
+
+            <div style="flex:1 1 auto; min-width:220px">
+              <label>Máx. intentos por “tick” (minado no bloqueante)</label>
+              <input type="number" id="batch" min="200" max="200000" value="25000" />
+              <div class="muted" style="margin-top:6px">Más alto = mina más rápido, pero consume más CPU.</div>
+            </div>
+          </div>
+
+          <div style="height:12px"></div>
+
+          <div class="row">
+            <button class="btn primary" id="mineBtn">⛏️ Minar y añadir bloque</button>
+            <button class="btn" id="verifyBtn">✅ Verificar cadena</button>
+            <button class="btn danger" id="resetBtn">Reset</button>
+          </div>
+
+          <div style="height:12px"></div>
+
+          <div class="small" id="logBox">Pulsa “Minar y añadir bloque”. Luego prueba “Tamper” en un bloque anterior y verifica la cadena.</div>
+
+          <div style="height:12px"></div>
+
+          <div class="small">
+Conceptos clave:
+1) Cada bloque incluye: índice, timestamp, datos, prevHash, nonce, hash.
+2) PoW: buscamos un hash que empiece con N ceros.
+3) Si cambias datos o nonce, cambia el hash.
+4) Como el siguiente bloque guarda prevHash, se rompe el enlace y la cadena deja de ser válida.
+          </div>
+        </div>
+      </section>
+
+      <!-- CADENA -->
+      <aside class="card">
+        <div class="hd">
+          <h2>Cadena de bloques</h2>
+          <span class="pill">
+            <span class="dot" id="chainDot"></span>
+            <span id="chainText">0 bloques</span>
+          </span>
+        </div>
+        <div class="bd">
+          <div class="chain" id="chain"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+<script>
+  // ---------- DOM ----------
+  const $ = (id) => document.getElementById(id);
+
+  // ---------- Theme ----------
+  $("themeBtn").addEventListener("click", () => {
+    const b = document.body;
+    const isDark = b.getAttribute("data-theme") === "dark";
+    b.setAttribute("data-theme", isDark ? "light" : "dark");
+  });
+
+  // ---------- Helpers ----------
+  const te = new TextEncoder();
+  function bytesToHex(buf){
+    const bytes = new Uint8Array(buf);
+    let hex = "";
+    for (const b of bytes) hex += b.toString(16).padStart(2,"0");
+    return hex;
+  }
+  async function sha256Hex(str){
+    const data = te.encode(str);
+    const hash = await crypto.subtle.digest("SHA-256", data);
+    return bytesToHex(hash);
+  }
+  function nowISO(){
+    return new Date().toISOString();
+  }
+  function setStatus(kind, msg){
+    const dot = $("statusDot");
+    dot.classList.remove("ok","bad","warn");
+    if (kind) dot.classList.add(kind);
+    $("statusText").textContent = msg;
+  }
+  function log(msg){
+    $("logBox").textContent = msg;
+  }
+  function targetPrefixZeros(n){
+    return "0".repeat(n);
+  }
+  function short(h){ return h ? (h.slice(0,10) + "…" + h.slice(-10)) : "—"; }
+
+  // ---------- Blockchain state ----------
+  const chain = [];
+
+  function blockHeaderString(b){
+    // Canonical-ish string (simple) to hash
+    return [
+      b.index,
+      b.timestamp,
+      b.data,
+      b.prevHash,
+      b.nonce
+    ].join("|");
+  }
+
+  async function computeBlockHash(b){
+    return sha256Hex(blockHeaderString(b));
+  }
+
+  async function createGenesis(){
+    const genesis = {
+      index: 0,
+      timestamp: nowISO(),
+      data: "GENESIS",
+      prevHash: "0".repeat(64),
+      nonce: 0,
+      hash: ""
+    };
+    genesis.hash = await computeBlockHash(genesis);
+    chain.push(genesis);
+    render();
+    await verifyChain();
+  }
+
+  // ---------- Mining (non-blocking) ----------
+  let mining = false;
+
+  async function mineBlock(data, difficulty, batchSize){
+    const prev = chain[chain.length - 1];
+    const b = {
+      index: prev.index + 1,
+      timestamp: nowISO(),
+      data,
+      prevHash: prev.hash,
+      nonce: 0,
+      hash: ""
+    };
+
+    const prefix = targetPrefixZeros(difficulty);
+    let attempts = 0;
+    let start = performance.now();
+
+    return new Promise((resolve, reject) => {
+      const tick = async () => {
+        try{
+          if (!mining) return reject(new Error("Mining cancelled"));
+
+          for (let i=0;i<batchSize;i++){
+            b.nonce++;
+            const h = await sha256Hex(blockHeaderString(b));
+            attempts++;
+            if (h.startsWith(prefix)){
+              b.hash = h;
+              const ms = Math.round(performance.now() - start);
+              return resolve({ block: b, attempts, ms });
+            }
+          }
+
+          // update log occasionally
+          if (attempts % (batchSize*2) === 0){
+            log(`⛏️ Minando… intentos: ${attempts.toLocaleString()} | nonce: ${b.nonce.toLocaleString()} | objetivo: ${prefix}…`);
+          }
+          // schedule next chunk (keeps UI responsive)
+          setTimeout(tick, 0);
+        }catch(e){
+          reject(e);
+        }
+      };
+
+      setTimeout(tick, 0);
+    });
+  }
+
+  // ---------- Verify ----------
+  async function verifyChain(){
+    if (!chain.length) return;
+
+    let ok = true;
+    for (let i=0;i<chain.length;i++){
+      const b = chain[i];
+      // recompute hash
+      const expected = await computeBlockHash(b);
+      const hashOk = (expected === b.hash);
+      const linkOk = (i === 0) ? (b.prevHash === "0".repeat(64)) : (b.prevHash === chain[i-1].hash);
+
+      b.__hashOk = hashOk;
+      b.__linkOk = linkOk;
+      b.__valid = hashOk && linkOk;
+      if (!b.__valid) ok = false;
+    }
+
+    render();
+
+    $("chainDot").classList.remove("ok","bad","warn");
+    if (ok){
+      $("chainDot").classList.add("ok");
+      log("✅ Cadena válida: hashes y enlaces correctos.");
+      setStatus("ok","Cadena válida");
+    }else{
+      $("chainDot").classList.add("bad");
+      log("❌ Cadena inválida: algún bloque fue manipulado o el enlace prevHash ya no coincide.");
+      setStatus("bad","Cadena inválida");
+    }
+  }
+
+  // ---------- UI render ----------
+  function render(){
+    $("chainText").textContent = `${chain.length} bloque(s)`;
+    const root = $("chain");
+    root.innerHTML = "";
+
+    chain.forEach((b, i) => {
+      const el = document.createElement("div");
+      el.className = "block " + (b.__valid ? "valid" : (b.__valid === false ? "invalid" : ""));
+      el.innerHTML = `
+        <div class="top">
+          <div class="left">
+            <div class="idx">Bloque #${b.index} ${b.index===0 ? "(genesis)" : ""}</div>
+            <div class="meta">${b.timestamp}</div>
+          </div>
+          <div class="btns">
+            ${b.index===0 ? "" : `<button class="btn danger" data-act="tamper" data-idx="${i}">Tamper</button>`}
+            <button class="btn" data-act="rehash" data-idx="${i}" title="Recalcular hash del bloque (sin arreglar prevHash de los siguientes)">Rehash</button>
+          </div>
+        </div>
+
+        <div class="kv">
+          <div class="k">data</div><div class="v">${escapeHtml(b.data)}</div>
+          <div class="k">prevHash</div><div class="v mono">${short(b.prevHash)}</div>
+          <div class="k">nonce</div><div class="v mono">${b.nonce.toLocaleString()}</div>
+          <div class="k">hash</div><div class="v mono">${short(b.hash)}</div>
+          <div class="k">estado</div><div class="v mono">${statusText(b)}</div>
+        </div>
+      `;
+
+      root.appendChild(el);
+      if (i < chain.length - 1){
+        const arrow = document.createElement("div");
+        arrow.className = "arrow";
+        root.appendChild(arrow);
+      }
+    });
+
+    // bind buttons
+    root.querySelectorAll("button[data-act]").forEach(btn => {
+      btn.addEventListener("click", async (e) => {
+        const act = btn.getAttribute("data-act");
+        const idx = Number(btn.getAttribute("data-idx"));
+        if (act === "tamper") await tamperBlock(idx);
+        if (act === "rehash") await rehashBlock(idx);
+      });
+    });
+  }
+
+  function statusText(b){
+    if (b.__valid === undefined) return "—";
+    if (b.__valid) return "VALID ✔";
+    // show what failed
+    const parts = [];
+    if (!b.__hashOk) parts.push("hash✖");
+    if (!b.__linkOk) parts.push("link✖");
+    return `INVALID ✖ (${parts.join(", ")})`;
+  }
+
+  function escapeHtml(s){
+    return String(s)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  // ---------- Actions ----------
+  async function tamperBlock(i){
+    const b = chain[i];
+    b.data = b.data + " [MODIFICADO]";
+    // No tocamos b.hash: simulamos ataque real (modifica datos, deja hash viejo)
+    log(`🧨 Tamper en Bloque #${b.index}: cambiaste "data" sin recomputar hash. Verifica la cadena.`);
+    setStatus("warn","Bloque modificado");
+    await verifyChain();
+  }
+
+  async function rehashBlock(i){
+    const b = chain[i];
+    b.hash = await computeBlockHash(b);
+    log(`🔁 Rehash Bloque #${b.index}: ahora su hash coincide con sus datos… pero romperás el enlace con el siguiente bloque (prevHash).`);
+    setStatus("warn","Hash recalculado");
+    await verifyChain();
+  }
+
+  // ---------- Buttons ----------
+  $("mineBtn").addEventListener("click", async () => {
+    if (mining) return;
+    const data = $("tx").value.trim();
+    const difficulty = Math.max(1, Math.min(6, Number($("difficulty").value)));
+    const batchSize = Math.max(200, Math.min(200000, Number($("batch").value)));
+
+    if (!data){
+      setStatus("bad","Transacción vacía");
+      return;
+    }
+
+    mining = true;
+    setStatus("warn","Minando…");
+    log(`⛏️ Iniciando minado con dificultad ${difficulty} (hash empieza por ${"0".repeat(difficulty)}…)`);
+
+    try{
+      const { block, attempts, ms } = await mineBlock(data, difficulty, batchSize);
+      chain.push(block);
+      mining = false;
+      render();
+      log(`✅ Bloque #${block.index} minado en ${ms} ms con ${attempts.toLocaleString()} intentos. Hash: ${block.hash}`);
+      setStatus("ok","Bloque minado");
+      await verifyChain();
+    }catch(e){
+      mining = false;
+      setStatus("bad","Minado cancelado / error");
+      log("❌ Minado cancelado o error: " + e.message);
+    }
+  });
+
+  $("verifyBtn").addEventListener("click", async () => {
+    await verifyChain();
+  });
+
+  $("resetBtn").addEventListener("click", async () => {
+    mining = false;
+    chain.length = 0;
+    $("tx").value = "Alice → Bob : 10 coins";
+    $("difficulty").value = "3";
+    $("batch").value = "25000";
+    setStatus("ok","Listo");
+    log("Cadena reiniciada. Se ha recreado el bloque genesis.");
+    await createGenesis();
+  });
+
+  // ---------- Init ----------
+  (async function init(){
+    $("chainDot").classList.add("warn");
+    setStatus("ok","Listo");
+    await createGenesis();
+  })();
+</script>
+</body>
+</html>
