@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bitcoin Blockchain Simulator</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --bg-2: #0f1730;
+      --panel: #141b34;
+      --panel-2: #1a2342;
+      --soft: #23305a;
+      --text: #eef3ff;
+      --muted: #a7b3d9;
+      --accent: #ffb020;
+      --accent-2: #4fd1c5;
+      --danger: #ff6b6b;
+      --success: #39d98a;
+      --warning: #ffd166;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+      --radius: 18px;
+      --mono: "JetBrains Mono", "Fira Code", Consolas, monospace;
+      --sans: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --border: rgba(255,255,255,.08);
+      --input-bg: #0f1630;
+      --chip-bg: rgba(255,255,255,.05);
+      --hero-grad-1: rgba(255,176,32,.14);
+      --hero-grad-2: rgba(79,209,197,.14);
+    }
+
+    html[data-theme="light"] {
+      --bg: #eef3fb;
+      --bg-2: #dde7f7;
+      --panel: #ffffff;
+      --panel-2: #f6f8fc;
+      --soft: #d6deee;
+      --text: #162033;
+      --muted: #5e6b85;
+      --accent: #e59b0f;
+      --accent-2: #0f9f98;
+      --danger: #d64545;
+      --success: #169b51;
+      --warning: #c98311;
+      --shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+      --border: rgba(22,32,51,.10);
+      --input-bg: #ffffff;
+      --chip-bg: rgba(22,32,51,.04);
+      --hero-grad-1: rgba(229,155,15,.12);
+      --hero-grad-2: rgba(15,159,152,.10);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      background:
+        radial-gradient(circle at top right, var(--hero-grad-1), transparent 25%),
+        radial-gradient(circle at top left, var(--hero-grad-2), transparent 22%),
+        linear-gradient(180deg, var(--bg), var(--bg-2) 55%, var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+      transition: background .25s ease, color .25s ease;
+    }
+
+    .wrap {
+      width: min(1500px, 96vw);
+      margin: 24px auto 40px;
+    }
+
+    .top-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 12px;
+    }
+
+    .theme-toggle {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: var(--chip-bg);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.35fr .95fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-main {
+      padding: 26px 26px 18px;
+    }
+
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1.02;
+      letter-spacing: -.03em;
+    }
+
+    .hero h1 span { color: var(--accent); }
+
+    .hero p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+      margin: 0 0 18px;
+      max-width: 72ch;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .chip {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--chip-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 12px;
+    }
+
+    .hero-side {
+      padding: 18px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      align-content: start;
+    }
+
+    .stat {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      min-height: 96px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -.03em;
+    }
+
+    .stat small {
+      display: block;
+      color: var(--muted);
+      margin-top: 6px;
+      font-size: 12px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .card { padding: 18px; }
+
+    h2, h3 {
+      margin: 0 0 14px;
+      letter-spacing: -.02em;
+    }
+
+    h2 { font-size: 20px; }
+    h3 { font-size: 16px; }
+
+    .sub {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      margin-top: -4px;
+      margin-bottom: 14px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    input, select {
+      width: 100%;
+      background: var(--input-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 11px 12px;
+      font: inherit;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: rgba(255,176,32,.75);
+      box-shadow: 0 0 0 3px rgba(255,176,32,.12);
+    }
+
+    .btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    button.action {
+      appearance: none;
+      border: 0;
+      border-radius: 12px;
+      padding: 11px 14px;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 700;
+      transition: transform .12s ease, opacity .12s ease;
+    }
+
+    button.action:hover { transform: translateY(-1px); }
+    button.action:active { transform: translateY(0); }
+    button.action:disabled { opacity: .55; cursor: not-allowed; }
+
+    .btn-primary { background: var(--accent); color: #1d1200; }
+    .btn-secondary { background: var(--soft); color: var(--text); }
+    .btn-success { background: var(--success); color: #062114; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-ghost { background: var(--chip-bg); color: var(--text); border: 1px solid var(--border); }
+
+    .wallets {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .wallet {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .wallet-name {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .wallet-balance {
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .wallet-balance span {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+      margin-left: 6px;
+    }
+
+    .mempool-list, .log, .concepts {
+      display: grid;
+      gap: 10px;
+      max-height: 290px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .tx-item, .log-item, .concept-item {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .tx-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+
+    .mono { font-family: var(--mono); }
+    .muted { color: var(--muted); }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .02em;
+    }
+
+    .badge.ok { background: rgba(57,217,138,.12); color: #8df1bb; }
+    .badge.warn { background: rgba(255,209,102,.12); color: #ffe39b; }
+    .badge.bad { background: rgba(255,107,107,.12); color: #ffb1b1; }
+    .badge.info { background: rgba(79,209,197,.12); color: #a8f6ef; }
+
+    html[data-theme="light"] .badge.ok { color: #0d7a3e; }
+    html[data-theme="light"] .badge.warn { color: #9a6500; }
+    html[data-theme="light"] .badge.bad { color: #b23030; }
+    html[data-theme="light"] .badge.info { color: #0f7d77; }
+
+    .chain-panel { padding: 18px; }
+
+    .chain-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .chain {
+      display: grid;
+      gap: 14px;
+      max-height: 1120px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .block {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .block::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 5px;
+      background: var(--accent);
+      opacity: .95;
+    }
+
+    .block.invalid::before { background: var(--danger); }
+
+    .block-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .block-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -.02em;
+    }
+
+    .block-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .mini {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      min-height: 78px;
+    }
+
+    .mini-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .mini-value {
+      font-size: 13px;
+      line-height: 1.45;
+      word-break: break-all;
+      font-family: var(--mono);
+    }
+
+    .txs {
+      display: grid;
+      gap: 8px;
+    }
+
+    .block-tx {
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      border-radius: 12px;
+      padding: 10px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .progress {
+      width: 100%;
+      height: 10px;
+      background: rgba(255,255,255,.08);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    html[data-theme="light"] .progress { background: rgba(22,32,51,.08); }
+
+    .progress > div {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #ffd87a);
+      width: 0%;
+      transition: width .15s ease;
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .legend span {
+      font-size: 12px;
+      color: var(--muted);
+      padding: 6px 10px;
+      background: var(--chip-bg);
+      border-radius: 999px;
+      border: 1px solid var(--border);
+    }
+
+    .tiny {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 1180px) {
+      .hero, .grid { grid-template-columns: 1fr; }
+      .hero-side { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    @media (max-width: 820px) {
+      .hero-side, .row, .wallets, .block-grid { grid-template-columns: 1fr; }
+      .wrap { width: min(100%, 96vw); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top-actions">
+      <button class="theme-toggle" id="themeToggle" type="button">🌙 Modo claro</button>
+    </div>
+
+    <section class="hero">
+      <div class="panel hero-main">
+        <div class="chips">
+          <span class="chip">HTML5 + CSS + JavaScript</span>
+          <span class="chip">Simulación visual</span>
+          <span class="chip">Hash SHA-256 real</span>
+          <span class="chip">Modo docente</span>
+        </div>
+        <h1>Simulador visual de <span>Blockchain Bitcoin</span></h1>
+        <p>
+          Esta app permite a tus alumnos ver cómo nacen las transacciones, cómo pasan a la mempool,
+          cómo se agrupan en bloques, cómo se calcula un <strong>Merkle Root</strong>, cómo funciona el <strong>nonce</strong>
+          en un minado simplificado y cómo una manipulación rompe la cadena.
+        </p>
+        <div class="legend">
+          <span>1. Crear transacción</span>
+          <span>2. Mandarla a mempool</span>
+          <span>3. Minar bloque</span>
+          <span>4. Intentar hacer trampa</span>
+          <span>5. Ver por qué la cadena falla</span>
+        </div>
+      </div>
+      <div class="panel hero-side">
+        <div class="stat">
+          <div class="stat-label">Bloques minados</div>
+          <div class="stat-value" id="statBlocks">1</div>
+          <small>Incluye bloque génesis</small>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Tx en mempool</div>
+          <div class="stat-value" id="statMempool">0</div>
+          <small>Pendientes de minar</small>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Dificultad</div>
+          <div class="stat-value" id="statDifficulty">3</div>
+          <small>Ceros iniciales requeridos</small>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Estado de la cadena</div>
+          <div class="stat-value" id="statValidity">✅</div>
+          <small id="statValidityText">Cadena válida</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="stack">
+        <div class="panel card">
+          <h2>Control docente</h2>
+          <div class="sub">Genera transacciones, ajusta dificultad y enseña visualmente qué ocurre cuando se mina o se altera un bloque.</div>
+
+          <div class="row">
+            <div>
+              <label for="sender">Emisor</label>
+              <select id="sender"></select>
+            </div>
+            <div>
+              <label for="receiver">Receptor</label>
+              <select id="receiver"></select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="amount">Cantidad (BTC)</label>
+              <input id="amount" type="number" min="0.1" step="0.1" value="1.2" />
+            </div>
+            <div>
+              <label for="fee">Fee del minero (BTC)</label>
+              <input id="fee" type="number" min="0" step="0.01" value="0.05" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="difficulty">Dificultad de minado</label>
+              <select id="difficulty">
+                <option value="1">1 cero</option>
+                <option value="2">2 ceros</option>
+                <option value="3" selected>3 ceros</option>
+                <option value="4">4 ceros</option>
+              </select>
+            </div>
+            <div>
+              <label for="maxTxPerBlock">Máx. tx por bloque</label>
+              <select id="maxTxPerBlock">
+                <option value="2">2</option>
+                <option value="3" selected>3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="btns">
+            <button class="action btn-primary" id="addTxBtn">Añadir transacción</button>
+            <button class="action btn-success" id="mineBtn">Minar siguiente bloque</button>
+            <button class="action btn-secondary" id="sampleBtn">Cargar demo</button>
+            <button class="action btn-danger" id="tamperBtn">Manipular último bloque</button>
+            <button class="action btn-ghost" id="repairBtn">Recalcular bloque alterado</button>
+            <button class="action btn-ghost" id="resetBtn">Reiniciar simulación</button>
+          </div>
+
+          <div style="margin-top:14px">
+            <label>Progreso de minado</label>
+            <div class="progress"><div id="mineProgress"></div></div>
+            <div class="tiny" id="mineStatus" style="margin-top:8px">Listo para minar.</div>
+          </div>
+        </div>
+
+        <div class="panel card">
+          <h3>Wallets simplificadas</h3>
+          <div class="sub">No es un modelo UTXO real de Bitcoin. Se usa un balance simplificado para explicar la lógica de transacciones y fees.</div>
+          <div class="wallets" id="wallets"></div>
+        </div>
+
+        <div class="panel card">
+          <h3>Mempool</h3>
+          <div class="sub">Aquí esperan las transacciones antes de ser incluidas por el minero en el siguiente bloque.</div>
+          <div class="mempool-list" id="mempoolList"></div>
+        </div>
+
+        <div class="panel card">
+          <h3>Conceptos clave</h3>
+          <div class="concepts">
+            <div class="concept-item"><strong>Bloque</strong><br><span class="muted">Paquete de transacciones confirmado por la red.</span></div>
+            <div class="concept-item"><strong>Hash</strong><br><span class="muted">Huella digital del bloque. Si cambia un dato, cambia el hash.</span></div>
+            <div class="concept-item"><strong>Nonce</strong><br><span class="muted">Número que el minero prueba miles de veces para encontrar un hash válido.</span></div>
+            <div class="concept-item"><strong>Prev Hash</strong><br><span class="muted">Hash del bloque anterior. Une toda la cadena.</span></div>
+            <div class="concept-item"><strong>Merkle Root</strong><br><span class="muted">Resumen hash de todas las transacciones del bloque.</span></div>
+            <div class="concept-item"><strong>Fee</strong><br><span class="muted">Pequeña comisión que incentiva al minero a incluir transacciones.</span></div>
+          </div>
+        </div>
+
+        <div class="panel card">
+          <h3>Registro didáctico</h3>
+          <div class="log" id="log"></div>
+        </div>
+      </div>
+
+      <div class="panel chain-panel">
+        <div class="chain-toolbar">
+          <div>
+            <h2 style="margin-bottom:4px">Cadena de bloques</h2>
+            <div class="sub" style="margin:0">Cada bloque enlaza con el anterior mediante su hash. Si tocas uno, rompes los siguientes.</div>
+          </div>
+          <div class="badge info">Red docente · simplificada</div>
+        </div>
+        <div class="chain" id="chain"></div>
+        <div class="footer-note">
+          Esta simulación mantiene la lógica pedagógica central de Bitcoin: transacciones → mempool → bloque → hash → nonce → prev hash → validación.
+          Se han simplificado varios detalles técnicos reales para que sea visual y usable en clase.
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const state = {
+      difficulty: 3,
+      maxTxPerBlock: 3,
+      mining: false,
+      wallets: {
+        Alice: 10,
+        Bob: 8,
+        Charlie: 12,
+        Diana: 6,
+        Miner: 0
+      },
+      mempool: [],
+      chain: [],
+      logs: []
+    };
+
+    const els = {
+      themeToggle: document.getElementById('themeToggle'),
+      sender: document.getElementById('sender'),
+      receiver: document.getElementById('receiver'),
+      amount: document.getElementById('amount'),
+      fee: document.getElementById('fee'),
+      difficulty: document.getElementById('difficulty'),
+      maxTxPerBlock: document.getElementById('maxTxPerBlock'),
+      addTxBtn: document.getElementById('addTxBtn'),
+      mineBtn: document.getElementById('mineBtn'),
+      sampleBtn: document.getElementById('sampleBtn'),
+      tamperBtn: document.getElementById('tamperBtn'),
+      repairBtn: document.getElementById('repairBtn'),
+      resetBtn: document.getElementById('resetBtn'),
+      wallets: document.getElementById('wallets'),
+      mempoolList: document.getElementById('mempoolList'),
+      chain: document.getElementById('chain'),
+      log: document.getElementById('log'),
+      statBlocks: document.getElementById('statBlocks'),
+      statMempool: document.getElementById('statMempool'),
+      statDifficulty: document.getElementById('statDifficulty'),
+      statValidity: document.getElementById('statValidity'),
+      statValidityText: document.getElementById('statValidityText'),
+      mineProgress: document.getElementById('mineProgress'),
+      mineStatus: document.getElementById('mineStatus')
+    };
+
+    function applyTheme(theme) {
+      const finalTheme = theme === 'light' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', finalTheme);
+      localStorage.setItem('btc-sim-theme', finalTheme);
+      els.themeToggle.textContent = finalTheme === 'dark' ? '🌙 Modo claro' : '☀️ Modo oscuro';
+    }
+
+    function loadTheme() {
+      const saved = localStorage.getItem('btc-sim-theme');
+      applyTheme(saved === 'light' ? 'light' : 'dark');
+    }
+
+    function nowISO() {
+      return new Date().toISOString();
+    }
+
+    function shortHash(h) {
+      if (!h) return '—';
+      return h.slice(0, 14) + '…' + h.slice(-10);
+    }
+
+    function formatBTC(v) {
+      return Number(v).toFixed(2);
+    }
+
+    async function sha256(text) {
+      const data = new TextEncoder().encode(text);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function merkleRoot(txs) {
+      if (!txs.length) return sha256('EMPTY');
+      let level = [];
+      for (const tx of txs) level.push(await sha256(JSON.stringify(tx)));
+      while (level.length > 1) {
+        const next = [];
+        for (let i = 0; i < level.length; i += 2) {
+          const left = level[i];
+          const right = level[i + 1] || level[i];
+          next.push(await sha256(left + right));
+        }
+        level = next;
+      }
+      return level[0];
+    }
+
+    function addLog(text, type = 'info') {
+      state.logs.unshift({ text, type, time: new Date().toLocaleTimeString() });
+      state.logs = state.logs.slice(0, 18);
+      renderLog();
+    }
+
+    function populateWalletSelectors() {
+      const names = Object.keys(state.wallets).filter(n => n !== 'Miner');
+      els.sender.innerHTML = names.map(n => `<option value="${n}">${n}</option>`).join('');
+      els.receiver.innerHTML = names.map(n => `<option value="${n}">${n}</option>`).join('');
+      els.receiver.value = names[1] || names[0];
+    }
+
+    async function computeBlockHash(block) {
+      const payload = JSON.stringify({
+        index: block.index,
+        timestamp: block.timestamp,
+        prevHash: block.prevHash,
+        nonce: block.nonce,
+        difficulty: block.difficulty,
+        merkleRoot: block.merkleRoot,
+        txs: block.txs,
+        miner: block.miner,
+        reward: block.reward
+      });
+      return await sha256(payload);
+    }
+
+    async function createGenesisBlock() {
+      const genesisTx = {
+        id: crypto.randomUUID(),
+        from: 'COINBASE',
+        to: 'Alice',
+        amount: 10,
+        fee: 0,
+        note: 'Bloque génesis didáctico'
+      };
+      const txs = [genesisTx];
+      const block = {
+        index: 0,
+        timestamp: nowISO(),
+        prevHash: '0'.repeat(64),
+        nonce: 0,
+        difficulty: 1,
+        txs,
+        merkleRoot: await merkleRoot(txs),
+        miner: 'Sistema',
+        reward: 0
+      };
+      block.hash = await computeBlockHash(block);
+      state.chain = [block];
+    }
+
+    function txTemplate(from, to, amount, fee) {
+      return {
+        id: crypto.randomUUID(),
+        from,
+        to,
+        amount: Number(amount),
+        fee: Number(fee),
+        time: nowISO()
+      };
+    }
+
+    function addTransaction(tx) {
+      const total = tx.amount + tx.fee;
+      if (tx.from === tx.to) {
+        addLog('No puedes enviar una transacción al mismo usuario en esta demo.', 'bad');
+        return false;
+      }
+      if (!Number.isFinite(total) || total <= 0) {
+        addLog('La transacción debe tener cantidad válida.', 'bad');
+        return false;
+      }
+      if (state.wallets[tx.from] < total) {
+        addLog(`Saldo insuficiente de ${tx.from}.`, 'bad');
+        return false;
+      }
+      state.mempool.push(tx);
+      addLog(`Nueva transacción: ${tx.from} → ${tx.to} (${formatBTC(tx.amount)} BTC, fee ${formatBTC(tx.fee)}).`, 'info');
+      renderAll();
+      return true;
+    }
+
+    function applyBlockToBalances(block) {
+      for (const tx of block.txs) {
+        if (tx.from !== 'COINBASE') state.wallets[tx.from] -= tx.amount + tx.fee;
+        state.wallets[tx.to] = (state.wallets[tx.to] || 0) + tx.amount;
+      }
+    }
+
+    async function mineNextBlock() {
+      if (state.mining) return;
+      if (!state.mempool.length) {
+        addLog('No hay transacciones en la mempool para minar.', 'warn');
+        return;
+      }
+
+      state.mining = true;
+      els.mineBtn.disabled = true;
+      els.mineStatus.textContent = 'Minando… buscando un hash con la dificultad pedida.';
+      els.mineProgress.style.width = '0%';
+
+      const txs = state.mempool.splice(0, state.maxTxPerBlock);
+      const fees = txs.reduce((acc, tx) => acc + tx.fee, 0);
+      const reward = 3.125;
+      const coinbase = txTemplate('COINBASE', 'Miner', reward + fees, 0);
+      coinbase.note = 'Recompensa + fees';
+      const blockTxs = [coinbase, ...txs];
+
+      const prev = state.chain[state.chain.length - 1];
+      const block = {
+        index: state.chain.length,
+        timestamp: nowISO(),
+        prevHash: prev.hash,
+        nonce: 0,
+        difficulty: state.difficulty,
+        txs: blockTxs,
+        merkleRoot: await merkleRoot(blockTxs),
+        miner: 'Miner',
+        reward
+      };
+
+      const targetPrefix = '0'.repeat(state.difficulty);
+      let attempts = 0;
+      let found = false;
+      const estimatedTarget = Math.pow(16, state.difficulty);
+      const visualCap = Math.min(estimatedTarget * 1.15, 300000);
+
+      while (!found) {
+        block.hash = await computeBlockHash(block);
+        attempts++;
+
+        if (block.hash.startsWith(targetPrefix)) {
+          found = true;
+          break;
+        }
+
+        block.nonce++;
+
+        if (attempts % 250 === 0) {
+          const pct = Math.min(98, (attempts / visualCap) * 100);
+          els.mineProgress.style.width = pct.toFixed(1) + '%';
+          els.mineStatus.textContent = `Intentos: ${attempts.toLocaleString()} · nonce actual: ${block.nonce.toLocaleString()} · hash: ${shortHash(block.hash)}`;
+          await new Promise(r => setTimeout(r, 0));
+        }
+      }
+
+      applyBlockToBalances(block);
+      state.chain.push(block);
+      els.mineProgress.style.width = '100%';
+      els.mineStatus.textContent = `Bloque minado. Nonce ganador: ${block.nonce.toLocaleString()} · Hash válido: ${shortHash(block.hash)}`;
+      addLog(`Bloque #${block.index} minado con nonce ${block.nonce.toLocaleString()} y ${block.txs.length} transacciones.`, 'ok');
+      state.mining = false;
+      els.mineBtn.disabled = false;
+      renderAll();
+    }
+
+    async function validateChain() {
+      for (let i = 0; i < state.chain.length; i++) {
+        const block = state.chain[i];
+        const expectedMerkle = await merkleRoot(block.txs);
+        const expectedHash = await computeBlockHash(block);
+        const prevHashOk = i === 0 ? block.prevHash === '0'.repeat(64) : block.prevHash === state.chain[i - 1].hash;
+        const proofOk = expectedHash.startsWith('0'.repeat(block.difficulty));
+        const hashOk = expectedHash === block.hash;
+        const merkleOk = expectedMerkle === block.merkleRoot;
+        block._valid = prevHashOk && hashOk && merkleOk && proofOk;
+        block._errors = [];
+        if (!prevHashOk) block._errors.push('prevHash no coincide');
+        if (!hashOk) block._errors.push('hash almacenado no coincide');
+        if (!merkleOk) block._errors.push('Merkle Root no coincide');
+        if (!proofOk) block._errors.push('hash no cumple dificultad');
+      }
+      return state.chain.every(b => b._valid);
+    }
+
+    async function tamperLastBlock() {
+      if (state.chain.length < 2) {
+        addLog('Necesitas al menos un bloque minado además del génesis.', 'warn');
+        return;
+      }
+      const last = state.chain[state.chain.length - 1];
+      const targetTx = last.txs.find(tx => tx.from !== 'COINBASE');
+      if (!targetTx) {
+        addLog('No hay una transacción normal en el último bloque para manipular.', 'warn');
+        return;
+      }
+      targetTx.amount = Number((targetTx.amount + 1.37).toFixed(2));
+      addLog(`Se ha manipulado el bloque #${last.index}: la cantidad de una transacción ha sido alterada.`, 'bad');
+      renderAll();
+    }
+
+    async function repairLastBlock() {
+      if (state.chain.length < 2) {
+        addLog('No hay bloque suficiente para recalcular.', 'warn');
+        return;
+      }
+      const last = state.chain[state.chain.length - 1];
+      last.merkleRoot = await merkleRoot(last.txs);
+      last.hash = await computeBlockHash(last);
+      addLog('Se ha recalculado el hash del último bloque. Sirve para explicar por qué tocar un bloque obliga a rehacer la cadena.', 'warn');
+      renderAll();
+    }
+
+    function loadSampleTransactions() {
+      [
+        txTemplate('Alice', 'Bob', 1.5, 0.05),
+        txTemplate('Charlie', 'Diana', 2.2, 0.03),
+        txTemplate('Bob', 'Alice', 0.7, 0.02),
+        txTemplate('Diana', 'Charlie', 1.1, 0.01)
+      ].forEach(addTransaction);
+      addLog('Se ha cargado una demo con varias transacciones para empezar rápido.', 'ok');
+      renderAll();
+    }
+
+    function resetProgress() {
+      els.mineProgress.style.width = '0%';
+      els.mineStatus.textContent = 'Listo para minar.';
+    }
+
+    async function resetSimulation() {
+      state.difficulty = 3;
+      state.maxTxPerBlock = 3;
+      state.mempool = [];
+      state.logs = [];
+      state.wallets = { Alice: 10, Bob: 8, Charlie: 12, Diana: 6, Miner: 0 };
+      populateWalletSelectors();
+      els.difficulty.value = '3';
+      els.maxTxPerBlock.value = '3';
+      await createGenesisBlock();
+      resetProgress();
+      addLog('Simulación reiniciada con bloque génesis.', 'ok');
+      renderAll();
+    }
+
+    function renderWallets() {
+      els.wallets.innerHTML = Object.entries(state.wallets).map(([name, balance]) => `
+        <div class="wallet">
+          <div class="wallet-name">${name}</div>
+          <div class="wallet-balance">${formatBTC(balance)} <span>BTC</span></div>
+        </div>
+      `).join('');
+    }
+
+    function renderMempool() {
+      if (!state.mempool.length) {
+        els.mempoolList.innerHTML = '<div class="tx-item"><span class="muted">La mempool está vacía. Añade transacciones para verlas aquí.</span></div>';
+        return;
+      }
+      els.mempoolList.innerHTML = state.mempool.map(tx => `
+        <div class="tx-item">
+          <div class="tx-head">
+            <strong>${tx.from} → ${tx.to}</strong>
+            <span class="badge warn">Pendiente</span>
+          </div>
+          <div class="mono">id: ${shortHash(tx.id.replace(/-/g,''))}</div>
+          <div style="margin-top:8px">Cantidad: <strong>${formatBTC(tx.amount)} BTC</strong> · Fee: <strong>${formatBTC(tx.fee)} BTC</strong></div>
+          <div class="tiny" style="margin-top:6px">${new Date(tx.time).toLocaleString()}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderLog() {
+      if (!state.logs.length) {
+        els.log.innerHTML = '<div class="log-item"><span class="muted">Aquí aparecerán los eventos explicativos de la simulación.</span></div>';
+        return;
+      }
+      els.log.innerHTML = state.logs.map(item => `
+        <div class="log-item">
+          <div class="tx-head"><span class="badge ${item.type === 'bad' ? 'bad' : item.type === 'warn' ? 'warn' : item.type === 'ok' ? 'ok' : 'info'}">${item.time}</span></div>
+          <div>${item.text}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderStats(valid) {
+      els.statBlocks.textContent = state.chain.length;
+      els.statMempool.textContent = state.mempool.length;
+      els.statDifficulty.textContent = state.difficulty;
+      els.statValidity.textContent = valid ? '✅' : '❌';
+      els.statValidityText.textContent = valid ? 'Cadena válida' : 'Cadena rota';
+    }
+
+    function blockValidityBadge(block) {
+      return block._valid ? '<span class="badge ok">Válido</span>' : '<span class="badge bad">Roto</span>';
+    }
+
+    async function renderChain() {
+      const valid = await validateChain();
+      els.chain.innerHTML = state.chain.map(block => `
+        <div class="block ${block._valid ? '' : 'invalid'}">
+          <div class="block-top">
+            <div>
+              <div class="block-title">Bloque #${block.index}</div>
+              <div class="tiny">${new Date(block.timestamp).toLocaleString()}</div>
+            </div>
+            <div>${blockValidityBadge(block)}</div>
+          </div>
+
+          <div class="block-grid">
+            <div class="mini">
+              <div class="mini-label">Hash del bloque</div>
+              <div class="mini-value">${block.hash}</div>
+            </div>
+            <div class="mini">
+              <div class="mini-label">Hash anterior</div>
+              <div class="mini-value">${block.prevHash}</div>
+            </div>
+            <div class="mini">
+              <div class="mini-label">Merkle Root</div>
+              <div class="mini-value">${block.merkleRoot}</div>
+            </div>
+            <div class="mini">
+              <div class="mini-label">Nonce · Dificultad</div>
+              <div class="mini-value">${block.nonce} · ${block.difficulty} cero(s)</div>
+            </div>
+          </div>
+
+          <div class="txs">
+            ${block.txs.map(tx => `
+              <div class="block-tx">
+                <strong>${tx.from}</strong> → <strong>${tx.to}</strong><br>
+                Cantidad: ${formatBTC(tx.amount)} BTC${tx.from !== 'COINBASE' ? ` · Fee: ${formatBTC(tx.fee)} BTC` : ''}
+                ${tx.note ? `<div class="tiny" style="margin-top:6px">${tx.note}</div>` : ''}
+              </div>
+            `).join('')}
+          </div>
+
+          ${block._valid ? '' : `
+            <div style="margin-top:12px">
+              <span class="badge bad">Problema detectado</span>
+              <div class="tiny" style="margin-top:8px">${block._errors.join(' · ')}</div>
+            </div>
+          `}
+        </div>
+      `).join('');
+      renderStats(valid);
+    }
+
+    async function renderAll() {
+      renderWallets();
+      renderMempool();
+      renderLog();
+      await renderChain();
+    }
+
+    function bindEvents() {
+      els.themeToggle.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme') || 'dark';
+        applyTheme(current === 'dark' ? 'light' : 'dark');
+      });
+
+      els.addTxBtn.addEventListener('click', () => {
+        const tx = txTemplate(
+          els.sender.value,
+          els.receiver.value,
+          parseFloat(els.amount.value),
+          parseFloat(els.fee.value)
+        );
+        addTransaction(tx);
+      });
+
+      els.mineBtn.addEventListener('click', mineNextBlock);
+      els.sampleBtn.addEventListener('click', loadSampleTransactions);
+      els.tamperBtn.addEventListener('click', tamperLastBlock);
+      els.repairBtn.addEventListener('click', repairLastBlock);
+      els.resetBtn.addEventListener('click', resetSimulation);
+
+      els.difficulty.addEventListener('change', e => {
+        state.difficulty = Number(e.target.value);
+        addLog(`Dificultad ajustada a ${state.difficulty} cero(s) iniciales.`, 'info');
+        renderAll();
+      });
+
+      els.maxTxPerBlock.addEventListener('change', e => {
+        state.maxTxPerBlock = Number(e.target.value);
+        addLog(`Máximo de transacciones por bloque ajustado a ${state.maxTxPerBlock}.`, 'info');
+        renderAll();
+      });
+    }
+
+    async function init() {
+      loadTheme();
+      populateWalletSelectors();
+      bindEvents();
+      await createGenesisBlock();
+      addLog('Bloque génesis creado. La red está lista.', 'ok');
+      await renderAll();
+    }
+
+    init();
+  </script>
+</body>
+</html>
