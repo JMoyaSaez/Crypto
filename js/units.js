@@ -1298,6 +1298,141 @@ Si te saltas esto: el modelo aprende “artefactos”, no realidad.`
 },
 //------------------------------------------------------------------------------------------------------------------------------
 //
+// Unidad 9 — 
+//
+//------------------------------------------------------------------------------------------------------------------------------
+{
+  id: "u9",
+  number: 9,
+  title: "Unidad 9 — Extracción de Información Supervisada y No Supervisada",
+  summary:
+    "Introducción a la extracción de información en Learning Analytics, ciencia de datos y machine learning. Diferencias entre aprendizaje supervisado y no supervisado, uso de regresión, árboles de decisión y clustering, y aplicación de estas técnicas en datasets grandes de sectores como educación, marketing, salud, finanzas y redes sociales.",
+  chips: ["Supervisado", "Clustering", "Big Data"],
+  figure: {
+    src: "img/u9_portada.jpg",
+    alt: "Portada unidad 9: extracción de información supervisada y no supervisada",
+    caption: "Unidad 9: cómo predecir, segmentar y extraer valor a partir de los datos."
+  },
+  blocks: [
+    {
+      h3: "9.1 Introducción a la extracción de información supervisada y no supervisada",
+      p: [
+        "La extracción de información es uno de los pilares del análisis de datos moderno. Su objetivo es transformar datos en conocimiento útil para apoyar decisiones, detectar patrones y anticipar comportamientos en contextos educativos, empresariales y sociales.",
+        "Dentro de este proceso distinguimos dos grandes enfoques. El aprendizaje supervisado trabaja con datos etiquetados y sirve para predecir valores o clasificar casos nuevos. El aprendizaje no supervisado, en cambio, busca estructuras ocultas sin etiquetas previas, siendo especialmente útil para segmentar, descubrir grupos y analizar comportamientos complejos."
+      ],
+      ul: [
+        "Supervisado: datos etiquetados → predicción y clasificación.",
+        "No supervisado: datos sin etiquetas → segmentación y descubrimiento de patrones.",
+        "Aplicación directa en Learning Analytics, marketing, salud, finanzas y redes sociales."
+      ]
+    },
+    {
+      h3: "9.2 Importancia en Learning Analytics y retos principales",
+      p: [
+        "En el ámbito educativo, estas técnicas permiten predecir rendimiento académico, identificar estudiantes en riesgo, segmentar perfiles de aprendizaje y personalizar estrategias docentes a partir de evidencias cuantitativas.",
+        "Sin embargo, trabajar con modelos de extracción de información también plantea retos importantes. No basta con obtener una predicción: los datos deben ser de calidad, los modelos deben poder escalar a grandes volúmenes, sus resultados deben ser interpretables y su uso debe respetar criterios éticos y normativos."
+      ],
+      ul: [
+        "Predicción de rendimiento y detección de abandono.",
+        "Segmentación de estudiantes según comportamiento y compromiso.",
+        "Retos clave: escalabilidad, calidad del dato, interpretabilidad y ética."
+      ]
+    },
+    {
+      h3: "9.3 Aprendizaje supervisado: regresión lineal y regresión logística",
+      p: [
+        "La regresión es una de las herramientas más utilizadas en aprendizaje supervisado. Permite modelar la relación entre variables y estimar resultados futuros a partir de información previa. En contextos educativos, puede servir para anticipar calificaciones, rendimiento o probabilidad de éxito académico.",
+        "La regresión lineal se utiliza cuando queremos predecir una variable continua, mientras que la regresión logística se aplica cuando la salida es categórica, por ejemplo aprobado o suspendido. Ambas técnicas destacan por su simplicidad, interpretabilidad y valor didáctico como puerta de entrada al machine learning."
+      ],
+      ul: [
+        "Regresión lineal: predicción de valores continuos.",
+        "Regresión logística: clasificación binaria y probabilidad.",
+        "Uso típico: calificaciones, aprobación/reprobación, riesgo o rendimiento."
+      ]
+    },
+    {
+      h3: "9.4 Árboles de decisión: reglas, segmentación e interpretación",
+      p: [
+        "Los árboles de decisión dividen los datos en subconjuntos a partir de reglas basadas en características observables. El modelo se representa como un árbol en el que cada nodo plantea una pregunta y cada rama conduce a una decisión o clasificación.",
+        "Su gran ventaja es la interpretabilidad: permiten visualizar por qué el modelo toma una decisión. Por eso son especialmente útiles en contextos donde no solo interesa acertar, sino también explicar el criterio seguido, como educación, salud o análisis de riesgos."
+      ],
+      ul: [
+        "Modelo visual basado en preguntas y reglas.",
+        "Capta relaciones no lineales entre variables.",
+        "Riesgo de sobreajuste si no se poda o ajusta correctamente."
+      ]
+    },
+    {
+      h3: "9.5 Aprendizaje no supervisado: clustering como descubrimiento de estructura",
+      p: [
+        "Cuando no disponemos de etiquetas, el aprendizaje no supervisado permite explorar la estructura interna de los datos. El clustering es la técnica más representativa dentro de este enfoque y consiste en agrupar observaciones similares entre sí y diferentes del resto.",
+        "En Learning Analytics, esto permite detectar perfiles de estudiantes, niveles de implicación, patrones de uso de plataformas o grupos con necesidades distintas. En otros sectores se usa para segmentación de clientes, agrupación de documentos, análisis biológico o detección de comunidades."
+      ],
+      ul: [
+        "No necesita etiquetas previas.",
+        "Agrupa por similitud y revela patrones ocultos.",
+        "Muy útil para segmentación en educación y negocio."
+      ]
+    },
+    {
+      h3: "9.6 K-means y clustering jerárquico",
+      p: [
+        "K-means es un algoritmo iterativo basado en centroides. Agrupa los datos en k clústeres y asigna cada observación al centroide más cercano. Es rápido, intuitivo y muy útil cuando queremos una segmentación clara y eficiente.",
+        "El clustering jerárquico, por su parte, construye una estructura en árbol o dendrograma. No obliga a fijar desde el principio el número de clústeres y permite observar relaciones entre grupos a diferentes niveles. Su interpretación es muy rica, aunque su coste computacional puede ser mayor."
+      ],
+      ul: [
+        "K-means: rápido, eficiente y basado en centroides.",
+        "Jerárquico: estructura en árbol y visión multinivel.",
+        "Elección según tamaño del dataset, interpretabilidad y objetivo analítico."
+      ]
+    },
+    {
+      h3: "9.7 Datasets grandes: escalabilidad y optimización",
+      p: [
+        "Cuando el volumen de datos crece, el reto ya no es solo construir un modelo correcto, sino hacerlo de manera eficiente. En entornos Big Data, los algoritmos pueden volverse lentos o inviables si no se aplican estrategias específicas de escalabilidad y optimización.",
+        "Entre las técnicas más habituales se encuentran el muestreo representativo, el procesamiento distribuido con frameworks como Spark o Hadoop, la reducción de dimensionalidad y el entrenamiento por lotes pequeños. También aparecen versiones optimizadas de algoritmos clásicos, como Mini-batch K-means o el uso de SGD en modelos de regresión."
+      ],
+      ul: [
+        "Muestreo, procesamiento distribuido y reducción de dimensionalidad.",
+        "Mini-batch K-means y SGD para mejorar rendimiento.",
+        "Objetivo: escalar sin perder demasiada precisión ni interpretabilidad."
+      ]
+    },
+    {
+      h3: "9.8 Casos prácticos en distintos sectores",
+      p: [
+        "Las técnicas vistas en esta unidad tienen aplicaciones directas en muchos ámbitos. En marketing permiten segmentar clientes y personalizar campañas; en salud ayudan al diagnóstico y la predicción de riesgos; en finanzas mejoran la detección de fraudes; y en redes sociales facilitan el análisis de comunidades e interacciones.",
+        "Estos casos muestran que la extracción de información no es solo una cuestión técnica. También exige saber interpretar resultados, valorar limitaciones, entender el contexto del problema y decidir qué modelo tiene más sentido según el tipo de datos y la finalidad del análisis."
+      ],
+      ul: [
+        "Marketing: segmentación y personalización.",
+        "Salud: diagnóstico y predicción de riesgo.",
+        "Finanzas y redes sociales: fraude, anomalías y comunidades."
+      ]
+    }
+  ],
+  extras: [
+    {
+      title: "Resultados de aprendizaje (qué deberían dominar)",
+      p: [
+        "Distinguir con claridad entre aprendizaje supervisado y no supervisado, comprendiendo cuándo conviene utilizar cada enfoque.",
+        "Aplicar regresión lineal, regresión logística y árboles de decisión en problemas sencillos de predicción y clasificación.",
+        "Utilizar K-means y clustering jerárquico para segmentar datos y descubrir estructuras ocultas en conjuntos sin etiquetar.",
+        "Comprender los principales retos de trabajar con datasets grandes, incluyendo escalabilidad, optimización, interpretabilidad y calidad del dato.",
+        "Analizar casos reales de distintos sectores y justificar la elección de técnicas en función del problema planteado."
+      ]
+    },
+    {
+      title: "Idea de práctica para enlazar con tu web (HTML5)",
+      p: [
+        "Actividad sugerida: ‘Predict or Cluster Lab’. La app permite cargar un pequeño dataset y elegir entre dos modos: supervisado o no supervisado. En el modo supervisado, el alumno prueba una regresión o un árbol de decisión para predecir un resultado. En el modo no supervisado, aplica K-means para ver cómo se forman clústeres.",
+        "La práctica puede cerrar con una comparación guiada: qué información aporta cada enfoque, qué limitaciones tiene, cómo cambia la interpretación y qué pasaría si el dataset creciera muchísimo."
+      ]
+    }
+  ]
+}  
+//------------------------------------------------------------------------------------------------------------------------------
+//
 //
 //------------------------------------------------------------------------------------------------------------------------------
 ];
