@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Learning Analytics Lab</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #121a2b;
+      --panel-2: #18243a;
+      --text: #ecf3ff;
+      --muted: #9fb0cf;
+      --line: #2a3958;
+      --accent: #5ea1ff;
+      --good: #29c36a;
+      --warn: #f1b84b;
+      --bad: #ff6b6b;
+      --shadow: 0 20px 60px rgba(0,0,0,.28);
+      --radius: 20px;
+    }
+
+    body.light {
+      --bg: #eef4ff;
+      --panel: #ffffff;
+      --panel-2: #f6f9ff;
+      --text: #15233d;
+      --muted: #5f7193;
+      --line: #d9e4f6;
+      --accent: #2563eb;
+      --good: #16a34a;
+      --warn: #d97706;
+      --bad: #dc2626;
+      --shadow: 0 16px 40px rgba(16,24,40,.10);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(94,161,255,.18), transparent 25%),
+        radial-gradient(circle at bottom left, rgba(94,161,255,.10), transparent 30%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.5fr auto;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .hero-card {
+      background: linear-gradient(135deg, rgba(94,161,255,.13), rgba(94,161,255,.04));
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(6px);
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1.05;
+    }
+
+    .sub {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.02rem;
+      line-height: 1.55;
+      max-width: 900px;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    button, select {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font: inherit;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+
+    button:hover, select:hover {
+      transform: translateY(-1px);
+      border-color: var(--accent);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    .card h2 {
+      margin: 0 0 14px;
+      font-size: 1.15rem;
+    }
+
+    .controls {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--panel-2);
+    }
+
+    .field-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .field label {
+      font-weight: 600;
+      display: block;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: .92rem;
+      line-height: 1.45;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .value-pill {
+      min-width: 80px;
+      text-align: center;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(94,161,255,.12);
+      color: var(--text);
+      font-weight: 700;
+      font-size: .95rem;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .metric .k {
+      color: var(--muted);
+      font-size: .9rem;
+      margin-bottom: 8px;
+    }
+
+    .metric .v {
+      font-size: 1.6rem;
+      font-weight: 800;
+    }
+
+    .risk-box {
+      border-radius: 22px;
+      padding: 18px;
+      margin-bottom: 16px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+    }
+
+    .risk-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      letter-spacing: .2px;
+    }
+
+    .risk-green { background: rgba(41,195,106,.14); color: var(--good); }
+    .risk-yellow { background: rgba(241,184,75,.14); color: var(--warn); }
+    .risk-red { background: rgba(255,107,107,.14); color: var(--bad); }
+
+    .bar {
+      width: 100%;
+      height: 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      overflow: hidden;
+      border: 1px solid var(--line);
+      margin: 12px 0 10px;
+    }
+
+    .bar-fill {
+      height: 100%;
+      width: 0;
+      border-radius: 999px;
+      transition: width .35s ease;
+      background: linear-gradient(90deg, var(--good), var(--warn), var(--bad));
+    }
+
+    .section-title {
+      font-weight: 800;
+      margin: 18px 0 8px;
+      font-size: 1rem;
+    }
+
+    ul {
+      margin: 8px 0 0 18px;
+      padding: 0;
+    }
+
+    li {
+      margin: 7px 0;
+      line-height: 1.45;
+    }
+
+    .preset-row, .exercise-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .ghost {
+      background: transparent;
+    }
+
+    .challenge {
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    .challenge-box {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      background: var(--panel-2);
+    }
+
+    .scenario-name {
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .options {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .option {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px 14px;
+      background: var(--panel);
+      cursor: pointer;
+      transition: .2s ease;
+    }
+
+    .option:hover { border-color: var(--accent); }
+    .option.correct { border-color: var(--good); box-shadow: inset 0 0 0 1px var(--good); }
+    .option.wrong { border-color: var(--bad); box-shadow: inset 0 0 0 1px var(--bad); }
+
+    .feedback {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      line-height: 1.5;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: .92rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 980px) {
+      .grid { grid-template-columns: 1fr; }
+      .metrics { grid-template-columns: 1fr; }
+      .hero { grid-template-columns: 1fr; }
+      .top-actions { justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="hero-card">
+        <h1>Learning Analytics Lab</h1>
+        <p class="sub">
+          Simulador HTML5 para analizar el riesgo académico de un estudiante a partir de datos educativos.
+          Cambia asistencia, participación, tiempo en la plataforma, calificaciones y entregas. Después interpreta el resultado
+          como si fueras docente y decide qué intervención educativa tiene más sentido.
+        </p>
+      </div>
+      <div class="top-actions">
+        <button id="themeBtn">🌙 / ☀️ Tema</button>
+        <button id="resetBtn" class="ghost">Reiniciar</button>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h2>1) Datos del estudiante</h2>
+        <div class="controls">
+          <div class="field">
+            <div class="field-top">
+              <label for="attendance">Asistencia</label>
+              <span class="value-pill" id="attendanceVal">75%</span>
+            </div>
+            <input id="attendance" type="range" min="0" max="100" value="75" />
+            <div class="hint">Presencia en clase o seguimiento de sesiones síncronas.</div>
+          </div>
+
+          <div class="field">
+            <div class="field-top">
+              <label for="participation">Participación en foros / actividades</label>
+              <span class="value-pill" id="participationVal">60%</span>
+            </div>
+            <input id="participation" type="range" min="0" max="100" value="60" />
+            <div class="hint">Interacción social y académica en la plataforma.</div>
+          </div>
+
+          <div class="field">
+            <div class="field-top">
+              <label for="lmsTime">Tiempo semanal en LMS</label>
+              <span class="value-pill" id="lmsTimeVal">4.0 h</span>
+            </div>
+            <input id="lmsTime" type="range" min="0" max="10" step="0.5" value="4" />
+            <div class="hint">Horas de conexión dedicadas a estudiar, leer o revisar materiales.</div>
+          </div>
+
+          <div class="field">
+            <div class="field-top">
+              <label for="quizAvg">Media de cuestionarios</label>
+              <span class="value-pill" id="quizAvgVal">6.5/10</span>
+            </div>
+            <input id="quizAvg" type="range" min="0" max="10" step="0.1" value="6.5" />
+            <div class="hint">Indicador directo del rendimiento en evaluación continua.</div>
+          </div>
+
+          <div class="field">
+            <div class="field-top">
+              <label for="delivery">Entregas a tiempo</label>
+              <span class="value-pill" id="deliveryVal">80%</span>
+            </div>
+            <input id="delivery" type="range" min="0" max="100" value="80" />
+            <div class="hint">Cumplimiento de plazos y constancia académica.</div>
+          </div>
+        </div>
+
+        <div class="preset-row">
+          <button data-preset="stable">Alumno estable</button>
+          <button data-preset="warning">Alumno en riesgo medio</button>
+          <button data-preset="critical">Alumno en riesgo alto</button>
+        </div>
+
+        <div class="footer-note">
+          Pista didáctica: no basta con mirar una sola variable. El sentido de Learning Analytics está en combinar evidencias,
+          interpretar el contexto y decidir una intervención útil.
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>2) Interpretación analítica</h2>
+        <div class="metrics">
+          <div class="metric">
+            <div class="k">Riesgo académico</div>
+            <div class="v" id="riskScore">34%</div>
+          </div>
+          <div class="metric">
+            <div class="k">Predicción</div>
+            <div class="v" id="predictionText">Seguimiento aceptable</div>
+          </div>
+          <div class="metric">
+            <div class="k">Prioridad docente</div>
+            <div class="v" id="priorityText">Media</div>
+          </div>
+        </div>
+
+        <div class="risk-box">
+          <div id="riskBadge" class="risk-badge risk-yellow">🟡 Riesgo medio</div>
+          <div class="bar"><div id="barFill" class="bar-fill"></div></div>
+          <div id="explanation" class="hint"></div>
+
+          <div class="section-title">Factores que más pesan</div>
+          <ul id="factors"></ul>
+
+          <div class="section-title">Intervención recomendada</div>
+          <ul id="actions"></ul>
+        </div>
+
+        <div class="challenge">
+          <h2>3) Ejercicio de clase</h2>
+          <div class="challenge-box">
+            <div class="scenario-name" id="scenarioTitle">Caso 1 · Alumno con señales de abandono progresivo</div>
+            <div id="scenarioDesc" class="hint">
+              Observa el perfil actual. Después elige la intervención más razonable desde una perspectiva de Learning Analytics.
+            </div>
+            <div class="options" id="options"></div>
+            <div class="feedback" id="feedback">Selecciona una opción para comprobar si tu decisión pedagógica está alineada con los datos.</div>
+            <div class="exercise-row">
+              <button id="newChallengeBtn">Nuevo caso</button>
+              <button id="applyScenarioBtn" class="ghost">Cargar caso en sliders</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const els = {
+      attendance: document.getElementById('attendance'),
+      participation: document.getElementById('participation'),
+      lmsTime: document.getElementById('lmsTime'),
+      quizAvg: document.getElementById('quizAvg'),
+      delivery: document.getElementById('delivery'),
+      attendanceVal: document.getElementById('attendanceVal'),
+      participationVal: document.getElementById('participationVal'),
+      lmsTimeVal: document.getElementById('lmsTimeVal'),
+      quizAvgVal: document.getElementById('quizAvgVal'),
+      deliveryVal: document.getElementById('deliveryVal'),
+      riskScore: document.getElementById('riskScore'),
+      predictionText: document.getElementById('predictionText'),
+      priorityText: document.getElementById('priorityText'),
+      riskBadge: document.getElementById('riskBadge'),
+      explanation: document.getElementById('explanation'),
+      factors: document.getElementById('factors'),
+      actions: document.getElementById('actions'),
+      barFill: document.getElementById('barFill'),
+      options: document.getElementById('options'),
+      feedback: document.getElementById('feedback'),
+      scenarioTitle: document.getElementById('scenarioTitle'),
+      scenarioDesc: document.getElementById('scenarioDesc'),
+      themeBtn: document.getElementById('themeBtn'),
+      resetBtn: document.getElementById('resetBtn'),
+      newChallengeBtn: document.getElementById('newChallengeBtn'),
+      applyScenarioBtn: document.getElementById('applyScenarioBtn')
+    };
+
+    const defaults = {
+      attendance: 75,
+      participation: 60,
+      lmsTime: 4,
+      quizAvg: 6.5,
+      delivery: 80
+    };
+
+    const presets = {
+      stable: { attendance: 90, participation: 78, lmsTime: 6.5, quizAvg: 7.8, delivery: 92 },
+      warning: { attendance: 63, participation: 42, lmsTime: 2.5, quizAvg: 5.3, delivery: 58 },
+      critical: { attendance: 38, participation: 18, lmsTime: 1, quizAvg: 3.9, delivery: 25 }
+    };
+
+    const scenarios = [
+      {
+        title: 'Caso 1 · Alumno con señales de abandono progresivo',
+        desc: 'Baja asistencia, poca conexión y escasa participación. Los datos sugieren riesgo creciente, pero todavía hay margen para intervenir.',
+        profile: { attendance: 48, participation: 22, lmsTime: 1.5, quizAvg: 4.8, delivery: 40 },
+        options: [
+          'Esperar dos semanas más para ver si mejora solo.',
+          'Activar tutoría temprana, revisar barreras y proponer plan de apoyo.',
+          'Bajar la dificultad de toda la asignatura para toda la clase.',
+          'Eliminar sus faltas para mejorar artificialmente el dashboard.'
+        ],
+        correct: 1,
+        why: 'La respuesta más coherente es intervenir temprano y de forma personalizada. Learning Analytics no sirve para castigar, sino para detectar riesgo y actuar antes del abandono.'
+      },
+      {
+        title: 'Caso 2 · Buen rendimiento, baja participación visible',
+        desc: 'El estudiante obtiene buenas notas pero participa poco en foros. No todo indicador aislado implica problema real.',
+        profile: { attendance: 82, participation: 18, lmsTime: 3.5, quizAvg: 8.4, delivery: 88 },
+        options: [
+          'Clasificarlo como riesgo alto automáticamente.',
+          'Interpretar el dato con cautela y comprobar si aprende bien por otra vía.',
+          'Suspenderlo por no participar lo suficiente en los foros.',
+          'Ignorar totalmente los datos porque las notas son buenas.'
+        ],
+        correct: 1,
+        why: 'La clave es interpretar patrones completos. Un único indicador bajo no debe provocar una decisión extrema si el resto del desempeño es positivo.'
+      },
+      {
+        title: 'Caso 3 · Alumno constante pero con bajo resultado en cuestionarios',
+        desc: 'Asiste, entrega y entra al LMS, pero sus cuestionarios siguen siendo flojos. El problema puede ser conceptual, no de compromiso.',
+        profile: { attendance: 86, participation: 65, lmsTime: 5, quizAvg: 4.6, delivery: 90 },
+        options: [
+          'Recomendar materiales de refuerzo y seguimiento específico del contenido.',
+          'Reducirle automáticamente la nota final por no entender la asignatura.',
+          'Concluir que está a punto de abandonar.',
+          'No hacer nada porque entra mucho al LMS.'
+        ],
+        correct: 0,
+        why: 'Aquí los datos muestran constancia, pero dificultad académica. La intervención adecuada es refuerzo focalizado y no asumir abandono o desinterés.'
+      }
+    ];
+
+    let currentScenarioIndex = 0;
+
+    function setValues(values) {
+      Object.keys(values).forEach(key => {
+        els[key].value = values[key];
+      });
+      update();
+    }
+
+    function normalizeInverse(v, max) {
+      return Math.max(0, Math.min(1, 1 - (v / max)));
+    }
+
+    function normalizeDirect(v, max) {
+      return Math.max(0, Math.min(1, v / max));
+    }
+
+    function updateLabels() {
+      els.attendanceVal.textContent = `${Number(els.attendance.value)}%`;
+      els.participationVal.textContent = `${Number(els.participation.value)}%`;
+      els.lmsTimeVal.textContent = `${Number(els.lmsTime.value).toFixed(1)} h`;
+      els.quizAvgVal.textContent = `${Number(els.quizAvg.value).toFixed(1)}/10`;
+      els.deliveryVal.textContent = `${Number(els.delivery.value)}%`;
+    }
+
+    function buildFactors(data) {
+      const factorScores = [
+        { name: 'Asistencia', risk: normalizeInverse(data.attendance, 100), explain: data.attendance < 60 ? 'muy baja' : (data.attendance < 75 ? 'mejorable' : 'correcta') },
+        { name: 'Participación', risk: normalizeInverse(data.participation, 100), explain: data.participation < 35 ? 'escasa' : (data.participation < 60 ? 'media' : 'activa') },
+        { name: 'Tiempo en LMS', risk: normalizeInverse(data.lmsTime, 10), explain: data.lmsTime < 2 ? 'insuficiente' : (data.lmsTime < 4 ? 'ajustado' : 'adecuado') },
+        { name: 'Cuestionarios', risk: normalizeInverse(data.quizAvg, 10), explain: data.quizAvg < 5 ? 'por debajo del aprobado' : (data.quizAvg < 7 ? 'aceptable' : 'sólido') },
+        { name: 'Entregas', risk: normalizeInverse(data.delivery, 100), explain: data.delivery < 60 ? 'irregular' : (data.delivery < 80 ? 'mejorable' : 'constante') }
+      ];
+
+      factorScores.sort((a, b) => b.risk - a.risk);
+      return factorScores.slice(0, 3);
+    }
+
+    function computeRisk(data) {
+      const risk = (
+        normalizeInverse(data.attendance, 100) * 0.25 +
+        normalizeInverse(data.participation, 100) * 0.15 +
+        normalizeInverse(data.lmsTime, 10) * 0.15 +
+        normalizeInverse(data.quizAvg, 10) * 0.30 +
+        normalizeInverse(data.delivery, 100) * 0.15
+      ) * 100;
+      return Math.round(risk);
+    }
+
+    function riskMeta(score) {
+      if (score < 30) {
+        return {
+          badge: '🟢 Riesgo bajo',
+          badgeClass: 'risk-badge risk-green',
+          prediction: 'Evolución favorable',
+          priority: 'Baja',
+          explanation: 'El perfil general es estable. Conviene mantener seguimiento normal y reforzar fortalezas sin sobreactuar ante una sola métrica.',
+          actions: [
+            'Mantener seguimiento ordinario y feedback positivo.',
+            'Ofrecer retos o recursos avanzados si procede.',
+            'Vigilar cambios bruscos en próximas semanas.'
+          ]
+        };
+      }
+      if (score < 60) {
+        return {
+          badge: '🟡 Riesgo medio',
+          badgeClass: 'risk-badge risk-yellow',
+          prediction: 'Seguimiento aceptable',
+          priority: 'Media',
+          explanation: 'Hay señales que merecen atención. No parece un caso crítico, pero sí recomendable una intervención temprana y focalizada.',
+          actions: [
+            'Enviar feedback personalizado sobre puntos a mejorar.',
+            'Proponer recursos de refuerzo o práctica guiada.',
+            'Revisar la evolución en la próxima actividad.'
+          ]
+        };
+      }
+      return {
+        badge: '🔴 Riesgo alto',
+        badgeClass: 'risk-badge risk-red',
+        prediction: 'Alto riesgo de fracaso o abandono',
+        priority: 'Alta',
+        explanation: 'La combinación de indicadores sugiere una situación delicada. Learning Analytics recomendaría una intervención rápida, humana y específica.',
+        actions: [
+          'Activar tutoría individual o contacto directo con el estudiante.',
+          'Detectar barreras reales: comprensión, motivación, contexto o carga.',
+          'Diseñar un pequeño plan de recuperación con seguimiento corto.'
+        ]
+      };
+    }
+
+    function update() {
+      updateLabels();
+
+      const data = {
+        attendance: Number(els.attendance.value),
+        participation: Number(els.participation.value),
+        lmsTime: Number(els.lmsTime.value),
+        quizAvg: Number(els.quizAvg.value),
+        delivery: Number(els.delivery.value)
+      };
+
+      const score = computeRisk(data);
+      const meta = riskMeta(score);
+      const factors = buildFactors(data);
+
+      els.riskScore.textContent = `${score}%`;
+      els.predictionText.textContent = meta.prediction;
+      els.priorityText.textContent = meta.priority;
+      els.riskBadge.textContent = meta.badge;
+      els.riskBadge.className = meta.badgeClass;
+      els.explanation.textContent = meta.explanation;
+      els.barFill.style.width = `${score}%`;
+
+      els.factors.innerHTML = factors.map(f => `<li><strong>${f.name}</strong>: factor de riesgo ${Math.round(f.risk * 100)}% (${f.explain}).</li>`).join('');
+      els.actions.innerHTML = meta.actions.map(a => `<li>${a}</li>`).join('');
+    }
+
+    function renderScenario(index) {
+      currentScenarioIndex = index;
+      const s = scenarios[index];
+      els.scenarioTitle.textContent = s.title;
+      els.scenarioDesc.textContent = s.desc;
+      els.feedback.textContent = 'Selecciona una opción para comprobar si tu decisión pedagógica está alineada con los datos.';
+      els.options.innerHTML = '';
+
+      s.options.forEach((text, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'option';
+        btn.textContent = text;
+        btn.addEventListener('click', () => checkAnswer(i));
+        els.options.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(index) {
+      const s = scenarios[currentScenarioIndex];
+      const optionButtons = [...els.options.querySelectorAll('.option')];
+      optionButtons.forEach((btn, i) => {
+        btn.classList.remove('correct', 'wrong');
+        if (i === s.correct) btn.classList.add('correct');
+        if (i === index && i !== s.correct) btn.classList.add('wrong');
+      });
+
+      els.feedback.textContent = (index === s.correct ? '✅ Correcto. ' : '❌ No es la mejor decisión. ') + s.why;
+    }
+
+    function loadScenarioProfile() {
+      setValues(scenarios[currentScenarioIndex].profile);
+    }
+
+    document.querySelectorAll('[data-preset]').forEach(btn => {
+      btn.addEventListener('click', () => setValues(presets[btn.dataset.preset]));
+    });
+
+    [els.attendance, els.participation, els.lmsTime, els.quizAvg, els.delivery].forEach(el => {
+      el.addEventListener('input', update);
+    });
+
+    els.resetBtn.addEventListener('click', () => setValues(defaults));
+    els.newChallengeBtn.addEventListener('click', () => {
+      const next = (currentScenarioIndex + 1) % scenarios.length;
+      renderScenario(next);
+    });
+    els.applyScenarioBtn.addEventListener('click', loadScenarioProfile);
+
+    els.themeBtn.addEventListener('click', () => {
+      document.body.classList.toggle('light');
+      localStorage.setItem('la-theme', document.body.classList.contains('light') ? 'light' : 'dark');
+    });
+
+    const savedTheme = localStorage.getItem('la-theme');
+    if (savedTheme === 'light') document.body.classList.add('light');
+
+    setValues(defaults);
+    renderScenario(0);
+  </script>
+</body>
+</html>
