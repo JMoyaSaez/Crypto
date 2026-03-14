@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mini Learning Analytics Lab</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel:#121a2f;
+      --panel-2:#17213d;
+      --text:#ecf2ff;
+      --muted:#9eb0d1;
+      --line:#263455;
+      --accent:#5ab0ff;
+      --accent-2:#63f2d5;
+      --good:#2ecc71;
+      --warn:#f5b041;
+      --bad:#ff6b6b;
+      --shadow:0 20px 40px rgba(0,0,0,.28);
+    }
+
+    body.light{
+      --bg:#f5f8ff;
+      --panel:#ffffff;
+      --panel-2:#eef4ff;
+      --text:#17233c;
+      --muted:#5b6b86;
+      --line:#d6e2f4;
+      --accent:#2e7cf6;
+      --accent-2:#19b89c;
+      --shadow:0 18px 34px rgba(33,56,110,.10);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter,Segoe UI,Arial,sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(90,176,255,.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(99,242,213,.10), transparent 25%),
+        linear-gradient(180deg, var(--bg), color-mix(in srgb, var(--bg) 88%, black));
+      color:var(--text);
+      transition:background .25s ease, color .25s ease;
+    }
+
+    .wrap{max-width:1380px;margin:0 auto;padding:24px}
+    .hero{
+      display:grid;
+      grid-template-columns:1.25fr .9fr;
+      gap:18px;
+      align-items:stretch;
+      margin-bottom:18px;
+    }
+    .panel{
+      background:linear-gradient(180deg,var(--panel),var(--panel-2));
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+    }
+    .hero-main{padding:26px 28px}
+    .eyebrow{
+      display:inline-flex;gap:8px;align-items:center;
+      font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+      color:var(--accent-2);margin-bottom:12px;
+    }
+    h1{margin:0 0 10px;font-size:clamp(28px,5vw,44px);line-height:1.05}
+    .lead{margin:0;color:var(--muted);font-size:16px;line-height:1.6;max-width:72ch}
+    .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+    .chip{
+      padding:8px 12px;border-radius:999px;
+      background:rgba(90,176,255,.12);border:1px solid rgba(90,176,255,.22);
+      color:var(--text);font-size:13px;font-weight:600;
+    }
+    .hero-side{padding:20px}
+    .hero-side h3{margin:0 0 12px;font-size:18px}
+    .hero-side ol{margin:0;padding-left:18px;color:var(--muted);line-height:1.7}
+    .hero-side strong{color:var(--text)}
+
+    .toolbar{
+      display:grid;grid-template-columns:1.4fr 1fr;gap:18px;margin-bottom:18px;
+    }
+    .controls,.report-box{padding:20px}
+    .controls-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+    .controls h2,.report-box h2,.section-title{margin:0 0 14px;font-size:21px}
+    .small{color:var(--muted);font-size:14px;line-height:1.55}
+
+    .button-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    button{
+      border:1px solid var(--line);background:#19243f;color:var(--text);
+      padding:11px 14px;border-radius:14px;font-weight:700;cursor:pointer;
+      transition:transform .15s ease, background .2s ease, border-color .2s ease;
+    }
+    body.light button{background:#f4f8ff}
+    button:hover{transform:translateY(-1px);border-color:var(--accent)}
+    button.primary{background:linear-gradient(135deg,var(--accent),#3977ff);border-color:transparent;color:white}
+    button.good{background:linear-gradient(135deg,var(--accent-2),#12b8a4);border-color:transparent;color:#062923}
+
+    .sliders{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:18px}
+    .slider-card{
+      padding:14px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.02)
+    }
+    .slider-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px}
+    .slider-head span:last-child{font-weight:800;color:var(--accent-2)}
+    input[type="range"]{width:100%}
+
+    .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:18px}
+    .card{padding:20px}
+    .label{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+    .value{font-size:34px;font-weight:900;line-height:1}
+    .sub{margin-top:8px;color:var(--muted);font-size:13px}
+    .good-t{color:var(--good)} .warn-t{color:var(--warn)} .bad-t{color:var(--bad)}
+
+    .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;margin-bottom:18px}
+    .table-box,.detail-box{padding:20px}
+    .table-wrap{overflow:auto;border-radius:18px;border:1px solid var(--line)}
+    table{width:100%;border-collapse:collapse;min-width:900px}
+    th,td{padding:12px 14px;border-bottom:1px solid var(--line);text-align:left}
+    th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:rgba(255,255,255,.03);position:sticky;top:0}
+    tr:hover td{background:rgba(90,176,255,.05)}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:800}
+    .pill.good{background:rgba(46,204,113,.14);color:#7dffb1;border:1px solid rgba(46,204,113,.28)}
+    .pill.warn{background:rgba(245,176,65,.14);color:#ffd08b;border:1px solid rgba(245,176,65,.28)}
+    .pill.bad{background:rgba(255,107,107,.14);color:#ffb0b0;border:1px solid rgba(255,107,107,.28)}
+    body.light .pill.good{color:#13743d}
+    body.light .pill.warn{color:#8a5c03}
+    body.light .pill.bad{color:#a12626}
+
+    .mini-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:14px 0}
+    .mini-stat{padding:14px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.02)}
+    .mini-stat .n{font-size:24px;font-weight:900;margin-top:4px}
+    .bar-group{display:grid;gap:12px;margin-top:12px}
+    .bar-row{display:grid;grid-template-columns:120px 1fr 50px;gap:10px;align-items:center}
+    .track{height:14px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;border:1px solid var(--line)}
+    .fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+
+    .exercise{padding:22px}
+    .exercise-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .question-card{padding:16px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.02)}
+    .question-card h4{margin:0 0 8px;font-size:16px}
+    .question-card p{margin:0;color:var(--muted);line-height:1.55}
+    textarea{
+      width:100%;min-height:150px;border-radius:16px;border:1px solid var(--line);
+      padding:14px;background:rgba(255,255,255,.03);color:var(--text);resize:vertical;
+      font:inherit;
+    }
+    .footer-note{margin-top:14px;color:var(--muted);font-size:13px;line-height:1.6}
+    .hint{padding:12px 14px;border-radius:16px;background:rgba(99,242,213,.09);border:1px solid rgba(99,242,213,.18);margin-top:14px;color:var(--text)}
+
+    @media (max-width:1100px){
+      .hero,.toolbar,.grid,.exercise-grid{grid-template-columns:1fr}
+      .cards{grid-template-columns:repeat(2,1fr)}
+    }
+    @media (max-width:700px){
+      .wrap{padding:14px}
+      .cards,.sliders,.mini-grid{grid-template-columns:1fr}
+      h1{font-size:30px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="panel hero-main">
+        <div class="eyebrow">Unidad 12 · HTML5 Lab</div>
+        <h1>Mini Learning Analytics Lab</h1>
+        <p class="lead">
+          Analiza una cohorte de estudiantes, ajusta los umbrales de riesgo, observa el dashboard y toma decisiones.
+          La idea es que el alumnado vea cómo los datos se transforman en <strong>informes, alertas y acción educativa</strong>.
+        </p>
+        <div class="chips">
+          <div class="chip">Dashboards</div>
+          <div class="chip">Informes</div>
+          <div class="chip">Alertas tempranas</div>
+          <div class="chip">Uso responsable de datos</div>
+        </div>
+      </div>
+      <div class="panel hero-side">
+        <h3>Propuesta de ejercicio</h3>
+        <ol>
+          <li><strong>Observa</strong> la cohorte inicial y detecta cuántos estudiantes están en riesgo.</li>
+          <li><strong>Ajusta</strong> los umbrales y justifica por qué cambian los resultados.</li>
+          <li><strong>Selecciona</strong> un estudiante y redacta una intervención razonada.</li>
+          <li><strong>Discute</strong> qué datos mostrarías al profesor y cuáles limitarías por privacidad.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="toolbar">
+      <div class="panel controls">
+        <div class="controls-top">
+          <div>
+            <h2>Control del laboratorio</h2>
+            <div class="small">Puedes trabajar con la cohorte de ejemplo o generar un grupo aleatorio para repetir el ejercicio varias veces.</div>
+          </div>
+          <div class="button-row" style="margin-top:0">
+            <button class="primary" id="btnSample">Cargar cohorte ejemplo</button>
+            <button id="btnRandom">Generar cohorte aleatoria</button>
+            <button id="btnTheme">Dark / Light</button>
+          </div>
+        </div>
+
+        <div class="sliders">
+          <div class="slider-card">
+            <div class="slider-head"><span>Nota mínima aceptable</span><span id="scoreVal">50</span></div>
+            <input id="scoreRange" type="range" min="20" max="80" value="50" />
+          </div>
+          <div class="slider-card">
+            <div class="slider-head"><span>Tareas mínimas entregadas (%)</span><span id="taskVal">60</span></div>
+            <input id="taskRange" type="range" min="20" max="100" value="60" />
+          </div>
+          <div class="slider-card">
+            <div class="slider-head"><span>Días máximos de inactividad</span><span id="inactiveVal">10</span></div>
+            <input id="inactiveRange" type="range" min="0" max="30" value="10" />
+          </div>
+          <div class="slider-card">
+            <div class="slider-head"><span>Participaciones mínimas en foro</span><span id="forumVal">2</span></div>
+            <input id="forumRange" type="range" min="0" max="12" value="2" />
+          </div>
+        </div>
+      </div>
+
+      <div class="panel report-box">
+        <h2>Informe automático</h2>
+        <textarea id="report" readonly></textarea>
+        <div class="button-row">
+          <button class="good" id="btnCopy">Copiar informe</button>
+        </div>
+        <div class="footer-note">
+          Este bloque sirve para que el alumnado vea cómo una herramienta puede convertir datos en una explicación pedagógica breve y accionable.
+        </div>
+      </div>
+    </section>
+
+    <section class="cards">
+      <div class="panel card">
+        <div class="label">Estudiantes analizados</div>
+        <div class="value" id="kpiStudents">0</div>
+        <div class="sub">Tamaño de la cohorte</div>
+      </div>
+      <div class="panel card">
+        <div class="label">En riesgo</div>
+        <div class="value bad-t" id="kpiRisk">0</div>
+        <div class="sub">Cumplen una o más condiciones de alerta</div>
+      </div>
+      <div class="panel card">
+        <div class="label">Nota media</div>
+        <div class="value warn-t" id="kpiAvg">0</div>
+        <div class="sub">Media global de la cohorte</div>
+      </div>
+      <div class="panel card">
+        <div class="label">Participación media</div>
+        <div class="value good-t" id="kpiEngagement">0</div>
+        <div class="sub">Combinación simple de tareas y foro</div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="panel table-box">
+        <div class="section-title">Tabla de estudiantes</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Estudiante</th>
+                <th>Nota</th>
+                <th>Tareas %</th>
+                <th>Días inactivo</th>
+                <th>Foro</th>
+                <th>Accesos</th>
+                <th>Estado</th>
+                <th>Motivo principal</th>
+              </tr>
+            </thead>
+            <tbody id="studentBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel detail-box">
+        <div class="section-title">Detalle del estudiante seleccionado</div>
+        <div id="detailContent" class="small">Haz clic sobre una fila para ver el perfil y la recomendación de intervención.</div>
+        <div class="mini-grid" id="detailStats" style="display:none">
+          <div class="mini-stat"><div class="label">Nota</div><div class="n" id="dScore">-</div></div>
+          <div class="mini-stat"><div class="label">Tareas %</div><div class="n" id="dTasks">-</div></div>
+          <div class="mini-stat"><div class="label">Inactividad</div><div class="n" id="dInactive">-</div></div>
+          <div class="mini-stat"><div class="label">Foro</div><div class="n" id="dForum">-</div></div>
+        </div>
+        <div class="bar-group" id="detailBars" style="display:none">
+          <div class="bar-row"><div>Nota</div><div class="track"><div class="fill" id="barScore"></div></div><div id="barScoreTxt">0</div></div>
+          <div class="bar-row"><div>Tareas</div><div class="track"><div class="fill" id="barTasks"></div></div><div id="barTasksTxt">0</div></div>
+          <div class="bar-row"><div>Foro</div><div class="track"><div class="fill" id="barForum"></div></div><div id="barForumTxt">0</div></div>
+        </div>
+        <div class="hint" id="recommendation" style="display:none"></div>
+      </div>
+    </section>
+
+    <section class="panel exercise">
+      <div class="section-title">Ejercicio guiado para clase</div>
+      <div class="exercise-grid">
+        <div class="question-card">
+          <h4>1. Diagnóstico</h4>
+          <p>¿Cuántos estudiantes aparecen en riesgo con la configuración inicial? ¿Qué variable parece explicar más casos: nota, inactividad, tareas o participación en foro?</p>
+        </div>
+        <div class="question-card">
+          <h4>2. Ajuste de umbrales</h4>
+          <p>Sube la nota mínima a 60 y baja la inactividad máxima a 7 días. ¿Qué cambia en el dashboard? ¿La herramienta se vuelve más sensible o más estricta?</p>
+        </div>
+        <div class="question-card">
+          <h4>3. Acción educativa</h4>
+          <p>Selecciona un estudiante en riesgo y redacta una intervención realista de 3 líneas: tutoría, recordatorio, cambio metodológico o apoyo personalizado.</p>
+        </div>
+        <div class="question-card">
+          <h4>4. Ética y privacidad</h4>
+          <p>¿Mostrarías todos estos datos a cualquier profesor? ¿Qué información debería agregarse, anonimizarse o restringirse para hacer un uso responsable?</p>
+        </div>
+      </div>
+      <div class="footer-note">
+        Objetivo didáctico: que el alumnado entienda que Learning Analytics no es solo “ver números”, sino transformar datos en decisiones pedagógicas razonadas y éticas.
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const sampleStudents = [
+      {name:"Aina", score:72, tasks:88, inactive:2, forum:4, access:91},
+      {name:"Bruno", score:43, tasks:52, inactive:12, forum:1, access:35},
+      {name:"Carla", score:61, tasks:74, inactive:4, forum:3, access:68},
+      {name:"Dani", score:38, tasks:40, inactive:16, forum:0, access:28},
+      {name:"Elena", score:84, tasks:95, inactive:1, forum:7, access:110},
+      {name:"Ferran", score:55, tasks:58, inactive:8, forum:1, access:49},
+      {name:"Gina", score:91, tasks:100, inactive:0, forum:8, access:122},
+      {name:"Hugo", score:47, tasks:67, inactive:14, forum:2, access:46},
+      {name:"Irene", score:66, tasks:82, inactive:3, forum:5, access:84},
+      {name:"Jordi", score:50, tasks:61, inactive:9, forum:2, access:57},
+      {name:"Laia", score:77, tasks:79, inactive:5, forum:4, access:88},
+      {name:"Marc", score:33, tasks:31, inactive:21, forum:0, access:19}
+    ];
+
+    let students = [];
+    let selectedIndex = null;
+
+    const els = {
+      body: document.getElementById('studentBody'),
+      kpiStudents: document.getElementById('kpiStudents'),
+      kpiRisk: document.getElementById('kpiRisk'),
+      kpiAvg: document.getElementById('kpiAvg'),
+      kpiEngagement: document.getElementById('kpiEngagement'),
+      report: document.getElementById('report'),
+      detailContent: document.getElementById('detailContent'),
+      detailStats: document.getElementById('detailStats'),
+      detailBars: document.getElementById('detailBars'),
+      recommendation: document.getElementById('recommendation'),
+      scoreRange: document.getElementById('scoreRange'),
+      taskRange: document.getElementById('taskRange'),
+      inactiveRange: document.getElementById('inactiveRange'),
+      forumRange: document.getElementById('forumRange'),
+      scoreVal: document.getElementById('scoreVal'),
+      taskVal: document.getElementById('taskVal'),
+      inactiveVal: document.getElementById('inactiveVal'),
+      forumVal: document.getElementById('forumVal'),
+    };
+
+    function thresholds(){
+      return {
+        score: Number(els.scoreRange.value),
+        tasks: Number(els.taskRange.value),
+        inactive: Number(els.inactiveRange.value),
+        forum: Number(els.forumRange.value)
+      };
+    }
+
+    function updateLabels(){
+      const t = thresholds();
+      els.scoreVal.textContent = t.score;
+      els.taskVal.textContent = t.tasks;
+      els.inactiveVal.textContent = t.inactive;
+      els.forumVal.textContent = t.forum;
+    }
+
+    function clone(obj){ return JSON.parse(JSON.stringify(obj)); }
+
+    function generateRandomCohort(size = 14){
+      const names = ["Alba","Arnau","Berta","Clara","David","Emma","Eric","Joan","Julia","Leo","Lucia","Marti","Nora","Oriol","Paula","Pol","Rita","Sara","Xavi","Yasmin"];
+      const used = new Set();
+      const arr = [];
+      while(arr.length < size){
+        const name = names[Math.floor(Math.random()*names.length)] + (used.has(name) ? ' ' + (arr.length+1) : '');
+        used.add(name);
+        arr.push({
+          name,
+          score: rand(28,95),
+          tasks: rand(20,100),
+          inactive: rand(0,24),
+          forum: rand(0,9),
+          access: rand(12,130)
+        });
+      }
+      return arr;
+    }
+
+    function rand(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+
+    function evaluateStudent(st, t){
+      const reasons = [];
+      if(st.score < t.score) reasons.push("nota baja");
+      if(st.tasks < t.tasks) reasons.push("pocas tareas");
+      if(st.inactive > t.inactive) reasons.push("mucha inactividad");
+      if(st.forum < t.forum) reasons.push("baja participación");
+
+      let status = 'good';
+      if(reasons.length >= 2) status = 'bad';
+      else if(reasons.length === 1) status = 'warn';
+
+      return {...st, reasons, status};
+    }
+
+    function statusLabel(status){
+      if(status === 'bad') return 'En riesgo';
+      if(status === 'warn') return 'Atención';
+      return 'Adecuado';
+    }
+
+    function reasonText(reasons){
+      if(!reasons.length) return 'Sin alertas';
+      return reasons.join(', ');
+    }
+
+    function render(){
+      updateLabels();
+      const t = thresholds();
+      const evaluated = students.map(s => evaluateStudent(s,t));
+
+      els.body.innerHTML = '';
+      evaluated.forEach((st, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${st.name}</strong></td>
+          <td>${st.score}</td>
+          <td>${st.tasks}%</td>
+          <td>${st.inactive} días</td>
+          <td>${st.forum}</td>
+          <td>${st.access}</td>
+          <td><span class="pill ${st.status}">${statusLabel(st.status)}</span></td>
+          <td>${reasonText(st.reasons)}</td>
+        `;
+        tr.addEventListener('click', ()=> selectStudent(idx, evaluated[idx]));
+        els.body.appendChild(tr);
+      });
+
+      const riskCount = evaluated.filter(s => s.status === 'bad').length;
+      const avgScore = average(evaluated.map(s => s.score));
+      const engagement = average(evaluated.map(s => (s.tasks + Math.min(s.forum*10,100))/2));
+
+      els.kpiStudents.textContent = evaluated.length;
+      els.kpiRisk.textContent = riskCount;
+      els.kpiAvg.textContent = avgScore.toFixed(1);
+      els.kpiEngagement.textContent = engagement.toFixed(1);
+
+      renderReport(evaluated, {riskCount, avgScore, engagement}, t);
+
+      if(selectedIndex !== null && evaluated[selectedIndex]) {
+        selectStudent(selectedIndex, evaluated[selectedIndex], true);
+      }
+    }
+
+    function average(arr){ return arr.reduce((a,b)=>a+b,0) / (arr.length || 1); }
+
+    function selectStudent(index, st, keepIndex = false){
+      if(!keepIndex) selectedIndex = index;
+      els.detailStats.style.display = 'grid';
+      els.detailBars.style.display = 'grid';
+      els.recommendation.style.display = 'block';
+      els.detailContent.innerHTML = `<strong>${st.name}</strong><br><span class="small">Estado: ${statusLabel(st.status)} · Motivos: ${reasonText(st.reasons)}</span>`;
+      document.getElementById('dScore').textContent = st.score;
+      document.getElementById('dTasks').textContent = st.tasks + '%';
+      document.getElementById('dInactive').textContent = st.inactive + ' d';
+      document.getElementById('dForum').textContent = st.forum;
+      document.getElementById('barScore').style.width = st.score + '%';
+      document.getElementById('barTasks').style.width = st.tasks + '%';
+      document.getElementById('barForum').style.width = Math.min(st.forum*10, 100) + '%';
+      document.getElementById('barScoreTxt').textContent = st.score;
+      document.getElementById('barTasksTxt').textContent = st.tasks + '%';
+      document.getElementById('barForumTxt').textContent = st.forum;
+      els.recommendation.innerHTML = recommendationFor(st);
+    }
+
+    function recommendationFor(st){
+      const out = [];
+      if(st.status === 'good'){
+        return `<strong>Recomendación:</strong> seguimiento normal. El estudiante muestra un patrón estable. Puede beneficiarse de feedback positivo y retos de profundización.`;
+      }
+      if(st.score < Number(els.scoreRange.value)) out.push('revisar comprensión de contenidos y ofrecer tutoría académica breve');
+      if(st.tasks < Number(els.taskRange.value)) out.push('establecer recordatorio o plan de entregas parciales');
+      if(st.inactive > Number(els.inactiveRange.value)) out.push('contactar pronto para reenganchar al estudiante antes de que aumente la desconexión');
+      if(st.forum < Number(els.forumRange.value)) out.push('promover participación guiada con una actividad sencilla o intervención en foro');
+      return `<strong>Recomendación:</strong> ${capitalize(out.join('; '))}.<br><br><strong>Pregunta didáctica:</strong> ¿esta intervención sería igual para un estudiante con baja nota pero alta participación?`;
+    }
+
+    function capitalize(txt){ return txt.charAt(0).toUpperCase() + txt.slice(1); }
+
+    function renderReport(evaluated, stats, t){
+      const riskStudents = evaluated.filter(s => s.status === 'bad').map(s => s.name);
+      const mainReason = mostFrequentReason(evaluated);
+      const txt = [
+        `Informe breve de Learning Analytics`,
+        ``,
+        `- Estudiantes analizados: ${evaluated.length}`,
+        `- Estudiantes en riesgo: ${stats.riskCount}`,
+        `- Nota media del grupo: ${stats.avgScore.toFixed(1)}`,
+        `- Participación media estimada: ${stats.engagement.toFixed(1)}`,
+        ``,
+        `Umbrales actuales: nota < ${t.score}, tareas < ${t.tasks}%, inactividad > ${t.inactive} días, foro < ${t.forum}.`,
+        ``,
+        `Motivo de alerta más frecuente: ${mainReason || 'sin alertas significativas'}.`,
+        riskStudents.length ? `Estudiantes prioritarios para intervención: ${riskStudents.join(', ')}.` : `No hay estudiantes en riesgo severo con la configuración actual.`,
+        ``,
+        `Siguiente paso sugerido: revisar casos priorizados y diseñar una intervención pedagógica proporcionada y respetuosa con la privacidad.`
+      ].join('\n');
+      els.report.value = txt;
+    }
+
+    function mostFrequentReason(evaluated){
+      const count = {};
+      evaluated.forEach(s => s.reasons.forEach(r => count[r] = (count[r] || 0) + 1));
+      const entries = Object.entries(count).sort((a,b)=> b[1]-a[1]);
+      return entries[0]?.[0] || '';
+    }
+
+    function loadSample(){
+      students = clone(sampleStudents);
+      selectedIndex = null;
+      render();
+      clearDetail();
+    }
+
+    function loadRandom(){
+      students = generateRandomCohort();
+      selectedIndex = null;
+      render();
+      clearDetail();
+    }
+
+    function clearDetail(){
+      els.detailContent.innerHTML = 'Haz clic sobre una fila para ver el perfil y la recomendación de intervención.';
+      els.detailStats.style.display = 'none';
+      els.detailBars.style.display = 'none';
+      els.recommendation.style.display = 'none';
+    }
+
+    document.getElementById('btnSample').addEventListener('click', loadSample);
+    document.getElementById('btnRandom').addEventListener('click', loadRandom);
+    document.getElementById('btnTheme').addEventListener('click', ()=> document.body.classList.toggle('light'));
+    document.getElementById('btnCopy').addEventListener('click', async ()=>{
+      try{
+        await navigator.clipboard.writeText(els.report.value);
+        alert('Informe copiado al portapapeles');
+      }catch{
+        alert('No se pudo copiar automáticamente');
+      }
+    });
+
+    [els.scoreRange, els.taskRange, els.inactiveRange, els.forumRange].forEach(el => el.addEventListener('input', render));
+
+    loadSample();
+  </script>
+</body>
+</html>
