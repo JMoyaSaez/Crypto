@@ -1430,7 +1430,438 @@ Si te saltas esto: el modelo aprende “artefactos”, no realidad.`
       ]
     }
   ]
-}  
+},
+
+//------------------------------------------------------------------------------------------------------------------------------
+//
+//
+//------------------------------------------------------------------------------------------------------------------------------
+{
+  id: "u10",
+  number: 10,
+  title: "Unidad 10 — Visualización e Interpretación de Datos",
+  summary:
+    "Introducción a la visualización de datos en Learning Analytics, su importancia para interpretar información educativa y apoyar la toma de decisiones. La unidad aborda los principios básicos de una buena visualización, el uso de herramientas en Python y R, y la construcción de dashboards interactivos para comunicar datos de forma clara, accesible y útil.",
+  chips: ["Principios", "Python/R", "Dashboards"],
+  figure: {
+    src: "img/u10_portada.jpg",
+    alt: "Portada unidad 10: visualización e interpretación de datos",
+    caption:
+      "Unidad 10: transformar datos educativos en visualizaciones claras, comprensibles y accionables."
+  },
+
+  blocks: [
+    {
+      h3: "10.1 Introducción a la visualización de datos en Learning Analytics",
+      p: [
+        "La visualización de datos consiste en representar información mediante gráficos, diagramas y paneles para facilitar su interpretación. En la era del big data, no basta con almacenar o procesar datos: también hay que comunicarlos de forma clara para que puedan apoyar decisiones reales.",
+        "En Learning Analytics, la visualización permite transformar registros académicos, actividad en LMS, participación o resultados de evaluación en información útil para docentes, estudiantes y administradores. Un buen gráfico puede revelar tendencias, relaciones o anomalías con mucha más claridad que una tabla extensa o un informe textual."
+      ],
+      ul: [
+        "Visualizar no es decorar datos: es hacerlos comprensibles.",
+        "En educación ayuda a detectar patrones, riesgo académico y evolución del aprendizaje.",
+        "Una buena visualización mejora interpretación, accesibilidad y toma de decisiones."
+      ]
+    },
+
+    {
+      h3: "10.2 Importancia, beneficios y desafíos de la visualización",
+      p: [
+        "La visualización aporta valor porque reduce la complejidad y permite ver rápidamente qué está ocurriendo en los datos. Por ejemplo, un diagrama de dispersión puede mostrar si existe relación entre horas de estudio y calificación, mientras que un gráfico temporal puede evidenciar la evolución del rendimiento durante un semestre.",
+        "Sin embargo, visualizar bien no es automático. Existen riesgos como la sobrecarga de información, la elección incorrecta del tipo de gráfico, la falta de accesibilidad o la manipulación involuntaria de escalas y ejes. Por eso, una parte esencial de esta unidad consiste en aprender no solo a ‘hacer gráficos’, sino a hacerlos con criterio."
+      ],
+      ul: [
+        "Beneficios: claridad, rapidez de interpretación, detección de patrones y apoyo a decisiones.",
+        "Desafíos: exceso de elementos, sesgos visuales, mal uso de escalas y falta de accesibilidad.",
+        "Una mala visualización puede confundir más que ayudar."
+      ]
+    },
+
+    {
+      h3: "10.3 Principios básicos de visualización",
+      p: [
+        "Toda visualización efectiva debe apoyarse en varios principios: claridad, simplificación, consistencia, veracidad, eficiencia y accesibilidad. La claridad exige que el mensaje principal se entienda rápido; la simplificación recuerda que menos es más; y la consistencia ayuda a comparar datos manteniendo colores, fuentes y formatos estables.",
+        "Además, una visualización debe ser veraz, es decir, representar los datos con honestidad, sin exagerar diferencias ni omitir información relevante. También debe ser eficiente en la elección del gráfico: barras para comparar categorías, líneas para tendencias, dispersión para relaciones e histogramas para distribuciones. Por último, debe ser accesible para diferentes usuarios, incluyendo personas con baja visión o daltonismo."
+      ],
+      ul: [
+        "Claridad: destacar lo importante y etiquetar bien.",
+        "Simplificación: eliminar ruido visual y reducir elementos innecesarios.",
+        "Consistencia: mantener colores, escalas y estilos homogéneos.",
+        "Veracidad: no manipular ejes ni exagerar diferencias.",
+        "Eficiencia: elegir el gráfico correcto según la pregunta.",
+        "Accesibilidad: usar contraste, leyendas claras y no depender solo del color."
+      ]
+    },
+
+    {
+      h3: "10.4 Herramientas de visualización en Python",
+      p: [
+        "Python es uno de los lenguajes más utilizados en ciencia de datos, y en visualización destaca especialmente por bibliotecas como Matplotlib y Seaborn. Matplotlib es muy flexible y permite construir gráficos de líneas, barras, dispersión e histogramas con gran capacidad de personalización. Se considera la base de la visualización en Python.",
+        "Seaborn, por su parte, se apoya en Matplotlib pero facilita la creación de gráficos estadísticos con una estética más cuidada y con mejor integración con Pandas. Es especialmente útil para correlaciones, distribuciones, comparaciones entre grupos y visualizaciones exploratorias con un aspecto más profesional desde el inicio."
+      ],
+      ul: [
+        "Matplotlib: muy flexible y potente, ideal para personalizar gráficos.",
+        "Seaborn: más alto nivel, más visual, mejor para análisis estadístico rápido.",
+        "Ambas herramientas son muy útiles en Learning Analytics para explorar rendimiento y relaciones entre variables."
+      ]
+    },
+
+    {
+      h3: "10.5 Herramientas de visualización en R",
+      p: [
+        "R sigue siendo un lenguaje de referencia en estadística e investigación, y dispone de herramientas muy potentes para visualización. Entre ellas destaca ggplot2, basado en la llamada ‘gramática de los gráficos’, que permite construir visualizaciones complejas por capas y con gran control conceptual del resultado final.",
+        "Además, R incluye Base Graphics, un sistema más simple y rápido para generar gráficos exploratorios. Aunque es menos flexible que ggplot2, resulta útil para visualizaciones directas y rápidas. En el contexto educativo, R es especialmente interesante cuando la visualización forma parte de análisis más estadísticos o de informes académicos."
+      ],
+      ul: [
+        "ggplot2: potente, elegante y muy usado en análisis e investigación.",
+        "Base Graphics: rápido y sencillo para gráficos exploratorios.",
+        "R destaca en contextos académicos, estadísticos y de reporting visual."
+      ]
+    },
+
+    {
+      h3: "10.6 Construcción de dashboards interactivos",
+      p: [
+        "Los dashboards permiten reunir varias visualizaciones e indicadores en una única interfaz para explorar datos de forma dinámica. En Learning Analytics, esto puede traducirse en paneles que muestren asistencia, participación, tendencias de rendimiento o predicción de estudiantes en riesgo, facilitando una visión global y operativa del estado del aprendizaje.",
+        "Entre las herramientas más destacadas están Dash en Python y Shiny en R, orientadas a crear aplicaciones web interactivas, así como Power BI y Tableau, más enfocadas a business intelligence y reporting profesional. Un buen dashboard no solo muestra datos: organiza la información con sentido, permite filtrar, navegar, comparar y descubrir patrones relevantes sin sobrecargar al usuario."
+      ],
+      ul: [
+        "Dash: dashboards interactivos en Python con enfoque web.",
+        "Shiny: equivalente en R para aplicaciones interactivas.",
+        "Power BI y Tableau: soluciones más visuales y listas para usar.",
+        "Claves de diseño: interactividad, narrativa visual y eficiencia de espacio."
+      ]
+    },
+
+    {
+      h3: "10.7 Buenas prácticas y mini-ejemplos rápidos",
+      p: [
+        "Para que un dashboard funcione bien, debe incluir buenas prácticas como uso de widgets, actualización dinámica de datos y diseño responsivo para distintos dispositivos. También conviene mostrar solo los indicadores realmente relevantes y construir una narrativa visual lógica que lleve al usuario desde la visión general hasta el detalle.",
+        "En esta unidad se recomienda practicar tanto con gráficos estáticos como con paneles interactivos. La idea no es solo aprender una librería, sino desarrollar criterio: elegir la herramienta adecuada, diseñar con honestidad y pensar siempre en quién va a interpretar la información y para qué."
+      ],
+      ul: [
+        "Buenas prácticas: widgets, filtros, actualización dinámica y diseño responsivo.",
+        "Un dashboard debe contar una historia útil, no solo acumular métricas.",
+        "La clave final es combinar técnica, criterio visual y comprensión del usuario."
+      ],
+      code:
+`# Mini-ejemplo rápido en Python con Matplotlib
+import matplotlib.pyplot as plt
+
+calificaciones = [85, 70, 95, 60, 80, 90, 75, 88, 92, 78]
+
+plt.hist(calificaciones, bins=5, edgecolor='black')
+plt.xlabel('Calificación')
+plt.ylabel('Número de estudiantes')
+plt.title('Distribución de calificaciones')
+plt.show()
+
+Idea clave:
+- Permite ver la distribución general de los datos
+- Es útil para detectar concentraciones, dispersión o valores extremos`
+    }
+  ],
+
+  extras: [
+    {
+      title: "Resultados de aprendizaje (qué deberían dominar)",
+      p: [
+        "Comprender la importancia de la visualización de datos como herramienta para interpretar información educativa y apoyar la toma de decisiones.",
+        "Aplicar principios de claridad, simplificación, consistencia, veracidad, eficiencia y accesibilidad en el diseño de visualizaciones.",
+        "Utilizar herramientas de Python y R para crear gráficos adecuados según el tipo de dato y la pregunta de análisis.",
+        "Diseñar dashboards interactivos que permitan explorar datos educativos de forma útil, clara y dinámica.",
+        "Evaluar críticamente la calidad de una visualización y detectar errores de diseño, sesgos o decisiones visuales inadecuadas."
+      ]
+    },
+    {
+      title: "Idea de práctica para enlazar con tu web (HTML5)",
+      p: [
+        "Actividad sugerida: ‘Dashboard educativo interactivo’. La app carga un pequeño conjunto de datos ficticios de estudiantes (asistencia, participación, horas de estudio y nota final) y permite cambiar entre gráfico de barras, líneas, dispersión e histograma. Después, el alumnado debe justificar qué gráfico es más adecuado para cada pregunta.",
+        "Como ampliación, pueden crear un mini-dashboard con filtros por asignatura, grupo o estudiante, y reflexionar sobre claridad, accesibilidad y posibles errores de interpretación. Así enlazan la teoría de visualización con una práctica real y muy visual en tu web."
+      ]
+    }
+  ]
+},
+//------------------------------------------------------------------------------------------------------------------------------
+//
+//
+//------------------------------------------------------------------------------------------------------------------------------
+{
+  id: "u11",
+  number: 11,
+  title: "Unidad 11 — Learning Analytics y personalización del aprendizaje",
+  summary:
+    "Introducción a Learning Analytics como disciplina que transforma datos educativos en decisiones pedagógicas. Se estudian sus objetivos principales: mejorar el rendimiento, personalizar la enseñanza, proporcionar retroalimentación útil, optimizar cursos e impulsar la investigación educativa. La unidad también aborda modelos predictivos, detección de abandono y casos prácticos como Knewton, Course Signals, DreamBox, MOOCs y detección de estilos de aprendizaje.",
+  chips: ["Learning Analytics", "Predicción educativa", "Personalización"],
+  figure: {
+    src: "img/u11_portada.jpg",
+    alt: "Portada unidad 11: Learning Analytics y educación basada en datos",
+    caption: "Unidad 11: datos educativos, modelos predictivos y personalización del aprendizaje."
+  },
+  blocks: [
+    {
+      h3: "11.1 Qué es Learning Analytics y por qué importa",
+      p: [
+        "Learning Analytics (LA) surge con la digitalización de la educación. Plataformas LMS, herramientas online y entornos virtuales generan gran cantidad de datos sobre comportamiento, participación, tiempo de conexión y rendimiento de los estudiantes.",
+        "El objetivo de LA no es solo medir, sino convertir esos datos en información útil para mejorar la enseñanza y el aprendizaje. Se trata de comprender mejor cómo aprende el alumnado, detectar problemas antes de que se agraven y apoyar decisiones pedagógicas más informadas."
+      ],
+      ul: [
+        "LA = medición, recopilación, análisis y reporte de datos educativos.",
+        "Permite pasar de intuiciones docentes a decisiones basadas en evidencias.",
+        "Se aplica a rendimiento, abandono, personalización y mejora de cursos."
+      ]
+    },
+    {
+      h3: "11.2 Cómo funciona Learning Analytics: del dato a la acción",
+      p: [
+        "El proceso de Learning Analytics sigue una lógica clara: primero se recopilan datos desde LMS, asistencia, foros, actividades, calificaciones o tiempo de estudio; después se procesan con técnicas estadísticas y algoritmos para encontrar patrones de comportamiento y rendimiento.",
+        "Finalmente, esos resultados se interpretan mediante informes, dashboards o alertas, y se transforman en acción educativa. Es decir, LA no se queda en el análisis: busca provocar intervenciones tempranas, recomendaciones personalizadas o rediseños de la experiencia formativa."
+      ],
+      ul: [
+        "Recopilación de datos: LMS, asistencia, foros, notas, tiempos de conexión.",
+        "Análisis y procesamiento: estadística, machine learning, minería de datos.",
+        "Interpretación: dashboards, alertas, informes y métricas.",
+        "Acción: apoyo a estudiantes, personalización y mejora del curso."
+      ]
+    },
+    {
+      h3: "11.3 Objetivos de Learning Analytics en educación",
+      p: [
+        "Learning Analytics tiene varios objetivos estratégicos. El primero es mejorar el rendimiento estudiantil detectando patrones de éxito o riesgo antes del fracaso. El segundo es personalizar el aprendizaje, adaptando contenido, ritmo y dificultad a las necesidades individuales.",
+        "Además, LA proporciona retroalimentación útil a docentes y estudiantes, ayuda a optimizar recursos y diseño de cursos, y aporta datos valiosos para la investigación educativa. En conjunto, convierte el sistema educativo en un entorno más adaptativo, eficiente y centrado en el estudiante."
+      ],
+      ul: [
+        "Mejora del rendimiento: detección temprana de bajo desempeño.",
+        "Personalización: contenidos y actividades adaptadas al estudiante.",
+        "Feedback basado en datos: informes y recomendaciones concretas.",
+        "Optimización de cursos: detectar módulos problemáticos o poco efectivos.",
+        "Investigación educativa: comprender mejor cómo se aprende."
+      ]
+    },
+    {
+      h3: "11.4 Modelos de predicción en el ámbito educativo",
+      p: [
+        "Uno de los aspectos más valiosos de LA es la capacidad de anticipar resultados. Para ello se emplean modelos como regresión logística, árboles de decisión, modelos de supervivencia, clasificadores y técnicas de clustering o recomendación.",
+        "Estos modelos permiten predecir si un estudiante aprobará o no, estimar riesgo de abandono, clasificar alumnado en niveles de riesgo, agrupar perfiles de aprendizaje y recomendar recursos según necesidades detectadas. No sustituyen al docente, pero sí amplían su capacidad para intervenir con mayor precisión."
+      ],
+      ul: [
+        "Regresión logística: probabilidad de aprobado/reprobado.",
+        "Árboles de decisión: reglas claras e interpretables para docentes.",
+        "Regresión de Cox: estimar cuándo puede producirse el abandono.",
+        "Clasificación de riesgo: Random Forest, SVM u otros modelos supervisados.",
+        "Clustering: agrupar estudiantes por patrones de aprendizaje.",
+        "Recomendación: sugerir recursos según comportamiento y dificultades."
+      ]
+    },
+    {
+      h3: "11.5 Casos prácticos de personalización del aprendizaje",
+      p: [
+        "La unidad presenta varios ejemplos reales o muy representativos del uso de Learning Analytics. Knewton ejemplifica el aprendizaje adaptativo, ajustando contenidos según progreso y dificultades. Course Signals, de la Universidad de Purdue, muestra cómo las alertas tempranas pueden ayudar a detectar estudiantes en riesgo.",
+        "DreamBox Learning representa una plataforma que adapta la dificultad en tiempo real, mientras que Coursera y edX ilustran el uso de analítica en MOOCs para recomendar contenidos y aumentar la finalización. También se plantea la detección de estilos de aprendizaje a partir de patrones de interacción, proponiendo más vídeos, lecturas, simulaciones o recursos visuales según el perfil observado."
+      ],
+      ul: [
+        "Knewton: adaptación del contenido según fortalezas y debilidades.",
+        "Course Signals: sistema de semáforo para alertar riesgo académico.",
+        "DreamBox: dificultad dinámica y feedback inmediato.",
+        "Coursera / edX: recomendaciones y recordatorios en MOOCs.",
+        "Estilos de aprendizaje: ajuste del formato del contenido según uso."
+      ]
+    },
+    {
+      h3: "11.6 Retos éticos y operativos de Learning Analytics",
+      p: [
+        "A pesar de su potencial, Learning Analytics no está exento de problemas. El primero es la privacidad: trabajar con datos educativos exige proteger la información y cumplir con regulaciones. También aparecen retos de interoperabilidad, ya que muchas plataformas no comparten datos fácilmente entre sí.",
+        "A esto se suma la necesidad de interpretar bien los resultados. Un dashboard complejo o un modelo mal entendido puede conducir a decisiones erróneas. Por eso, además de tecnología, LA requiere formación, criterios éticos y una implementación responsable para evitar sesgos, simplificaciones o dependencia excesiva de los algoritmos."
+      ],
+      ul: [
+        "Privacidad y seguridad de los datos educativos.",
+        "Cumplimiento normativo y uso ético de la información.",
+        "Interoperabilidad entre LMS y plataformas.",
+        "Necesidad de interfaces comprensibles y formación docente.",
+        "Riesgo de sesgos, falsos positivos y exceso de dependencia del modelo."
+      ]
+    },
+    {
+      h3: "11.7 Mini-escenarios rápidos (para clase y práctica)",
+      p: [
+        "Los mini-escenarios ayudan a entender cómo LA convierte datos en decisiones. El objetivo no es memorizar algoritmos, sino razonar qué datos se observan, qué patrón se detecta y qué acción educativa tendría sentido aplicar.",
+        "En clase se pueden plantear casos sencillos de predicción de riesgo, recomendación de contenido o segmentación de perfiles. Así el alumnado comprende que Learning Analytics no es solo tecnología, sino una herramienta para intervenir mejor en contextos educativos reales."
+      ],
+      code: `Escenario simple:
+Alumno A:
+- Asistencia: 52%
+- Participación en foros: muy baja
+- Tiempo en LMS: escaso
+- Último cuestionario: 4.2/10
+
+Interpretación:
+- Riesgo académico alto
+- Posible abandono si no hay intervención
+
+Acción posible:
+- Generar alerta al docente
+- Recomendar tutoría
+- Asignar recursos de refuerzo
+- Hacer seguimiento en la semana siguiente`
+    }
+  ],
+  extras: [
+    {
+      title: "Resultados de aprendizaje (qué deberían dominar)",
+      p: [
+        "Comprender los conceptos fundamentales de Learning Analytics y su relevancia en la educación moderna.",
+        "Explicar cómo los datos educativos pueden utilizarse para mejorar el rendimiento, personalizar la enseñanza y optimizar cursos.",
+        "Identificar modelos predictivos aplicados al ámbito educativo, como regresión logística, árboles de decisión, clasificación, clustering y recomendación.",
+        "Analizar casos prácticos de personalización del aprendizaje en plataformas adaptativas y MOOCs.",
+        "Reflexionar sobre implicaciones éticas como privacidad, consentimiento, sesgos e interpretación de resultados."
+      ]
+    },
+    {
+      title: "Idea de práctica para enlazar con tu web (HTML5)",
+      p: [
+        "Actividad sugerida: 'Dashboard de riesgo académico'. La app simula una plataforma educativa donde el alumnado ve variables como asistencia, participación, tiempo en LMS y calificaciones. A partir de esos datos, el sistema clasifica el riesgo (verde, amarillo, rojo) y propone acciones pedagógicas.",
+        "Como ampliación, se puede incluir una segunda parte donde la app recomiende recursos personalizados (vídeos, lecturas, ejercicios o tutoría) según el perfil detectado, para conectar Learning Analytics con intervención educativa real."
+      ]
+    }
+  ]
+},
+//------------------------------------------------------------------------------------------------------------------------------
+//
+//
+//------------------------------------------------------------------------------------------------------------------------------
+{
+  id: "u12",
+  number: 12,
+  title: "Unidad 12 — Desarrollo de Herramientas de Learning Analytics",
+  summary:
+    "Diseño e implementación de herramientas de Learning Analytics para identificar problemas educativos, analizar datos con Python e integrar información desde LMS mediante APIs. La unidad aborda también la comunicación efectiva de resultados mediante dashboards, informes y alertas, junto con los principios de ética, privacidad y uso responsable de los datos educativos.",
+  chips: ["Learning Analytics", "Python + APIs", "Dashboards + Ética"],
+  figure: {
+    src: "img/u12_portada.jpg",
+    alt: "Portada unidad 12: desarrollo de herramientas de learning analytics",
+    caption: "Unidad 12: datos educativos convertidos en decisiones pedagógicas útiles."
+  },
+  blocks: [
+    {
+      h3: "12.1 Fundamentos del Learning Analytics y detección de problemas educativos",
+      p: [
+        "La analítica del aprendizaje surge como respuesta a una necesidad muy concreta: aprovechar los datos generados por plataformas educativas, actividades y evaluaciones para comprender mejor cómo aprenden los estudiantes. No se trata solo de recopilar información, sino de transformarla en conocimiento accionable que permita mejorar la enseñanza, personalizar itinerarios y anticipar dificultades.",
+        "Antes de construir una herramienta de Learning Analytics, es imprescindible identificar qué problema queremos resolver. Algunos de los más habituales son la predicción del rendimiento, la detección de estudiantes en riesgo, el análisis de la participación, la personalización del aprendizaje y la optimización del diseño de cursos y materiales. En otras palabras, primero definimos la necesidad pedagógica y después diseñamos la solución analítica."
+      ],
+      ul: [
+        "Predicción del rendimiento: anticipar bajo desempeño o riesgo de abandono.",
+        "Detección de estudiantes en riesgo: intervenir antes de que el problema crezca.",
+        "Personalización del aprendizaje: adaptar recursos y estrategias a cada alumno.",
+        "Análisis de participación: medir compromiso, actividad y uso del entorno virtual.",
+        "Optimización de cursos: mejorar contenidos y estructura a partir del uso real."
+      ]
+    },
+    {
+      h3: "12.2 De la necesidad al objetivo: qué debe hacer una herramienta de Learning Analytics",
+      p: [
+        "Una vez detectados los problemas, la siguiente etapa consiste en traducirlos en objetivos claros y medibles. Una herramienta de Learning Analytics no puede limitarse a mostrar datos en bruto: debe estar orientada a una finalidad concreta, como clasificar estudiantes, lanzar alertas tempranas, recomendar recursos o ayudar al profesorado a rediseñar un curso.",
+        "Definir bien los objetivos evita construir sistemas técnicamente complejos pero pedagógicamente pobres. Por eso conviene preguntarse: qué queremos predecir, a quién ayudará la herramienta, qué decisiones permitirá tomar y qué indicadores serán realmente útiles. Un buen diseño conecta siempre datos, análisis y acción educativa."
+      ],
+      ul: [
+        "Predicción del rendimiento futuro a partir de comportamiento y participación.",
+        "Segmentación de estudiantes según desempeño, estilo o compromiso.",
+        "Mejora de retención y motivación mediante alertas tempranas.",
+        "Optimización de cursos con evidencia basada en uso real.",
+        "Sistemas de recomendación de materiales personalizados."
+      ]
+    },
+    {
+      h3: "12.3 Programación de herramientas: Python como base del análisis educativo",
+      p: [
+        "Python se ha convertido en el lenguaje de referencia para desarrollar herramientas de Learning Analytics porque permite trabajar con datos, automatizar procesos, entrenar modelos y generar visualizaciones desde un mismo entorno. Su ecosistema de bibliotecas hace posible construir desde pequeños análisis exploratorios hasta aplicaciones completas de seguimiento del aprendizaje.",
+        "Dentro de este ecosistema, Pandas facilita la manipulación de tablas de datos; NumPy acelera los cálculos numéricos; Scikit-learn aporta algoritmos de machine learning para clasificación, regresión o clustering; y Matplotlib/Seaborn permiten representar los resultados de forma visual. Esta combinación convierte a Python en una base ideal para implementar prototipos y soluciones reales en contextos educativos."
+      ],
+      ul: [
+        "Pandas: limpieza, filtrado, agrupación y análisis de datos educativos.",
+        "NumPy: medias, medianas, desviaciones y operaciones numéricas eficientes.",
+        "Scikit-learn: predicción, clasificación y segmentación de estudiantes.",
+        "Matplotlib y Seaborn: gráficos claros para interpretar relaciones y tendencias."
+      ]
+    },
+    {
+      h3: "12.4 Integración con plataformas educativas mediante APIs",
+      p: [
+        "Una herramienta de Learning Analytics necesita alimentarse de datos reales, y ahí entran en juego las APIs de los LMS y plataformas educativas. Gracias a estas interfaces, es posible recuperar información sobre accesos, tareas, foros, calificaciones, tiempos de dedicación o participación en actividades colaborativas.",
+        "En esta unidad aparecen como ejemplos Moodle Web Services, Google Classroom API y Microsoft Education API. Su valor no está solo en extraer datos, sino en permitir automatización y análisis casi en tiempo real. Esto abre la puerta a sistemas capaces de detectar inactividad, actualizar dashboards, generar informes automáticos o activar recomendaciones sin intervención manual constante."
+      ],
+      ul: [
+        "Moodle Web Services: acceso a cursos, actividad, calificaciones y seguimiento.",
+        "Google Classroom API: tareas, participación y datos académicos del aula digital.",
+        "Microsoft Education API: interacción en Teams, OneNote y entornos colaborativos.",
+        "Ventaja clave: automatizar la captura y actualización continua de información."
+      ]
+    },
+    {
+      h3: "12.5 Comunicación efectiva de resultados: dashboards, informes y alertas",
+      p: [
+        "El valor de una herramienta de Learning Analytics no depende solo de lo bien que analice, sino también de cómo comunica los resultados. Un modelo predictivo excelente pierde utilidad si el profesorado no entiende qué significa una alerta o si el estudiante no sabe interpretar su propio progreso. Por eso la visualización de datos y la comunicación pedagógica son parte central del diseño.",
+        "Los dashboards permiten mostrar métricas en tiempo real de forma intuitiva, interactiva y personalizable. Los informes personalizados aportan feedback automático y recomendaciones concretas. Las alertas y notificaciones facilitan intervenir a tiempo. Además, la formación de docentes y estudiantes mediante talleres, guías, manuales y recursos digitales es esencial para que la herramienta no sea solo técnica, sino realmente útil en el aula."
+      ],
+      ul: [
+        "Dashboards: visión rápida, clara e interactiva del progreso y la participación.",
+        "Gráficos interactivos: tendencias, correlaciones y patrones de aprendizaje.",
+        "Informes personalizados: feedback individualizado y recomendaciones.",
+        "Alertas y notificaciones: intervención temprana ante bajo rendimiento o abandono.",
+        "Capacitación: docentes y estudiantes deben saber interpretar y usar los datos."
+      ]
+    },
+    {
+      h3: "12.6 Ética, privacidad y mini-ejemplo de flujo analítico",
+      p: [
+        "Trabajar con datos educativos implica una gran responsabilidad. No basta con que una herramienta funcione: también debe respetar la privacidad, la transparencia y el control de acceso. Los estudiantes deben saber qué datos se recogen, para qué se usan y quién puede verlos. Además, solo deberían recopilarse los datos necesarios, aplicando principios de minimización, anonimización y acceso restringido.",
+        "En una implementación responsable, la herramienta no se diseña solo para detectar riesgo, sino también para proteger a la persona analizada. Por eso la ética no es un añadido final, sino una condición de diseño desde el primer momento. La mejor herramienta de Learning Analytics es aquella que mejora la educación sin comprometer la confianza de estudiantes y docentes."
+      ],
+      ul: [
+        "Transparencia: explicar qué datos se recopilan y con qué finalidad.",
+        "Consentimiento informado: el usuario debe conocer y aceptar el uso de sus datos.",
+        "Minimización de datos: recoger solo lo estrictamente necesario.",
+        "Anonimización: proteger identidades en análisis agregados o informes globales.",
+        "Acceso restringido: solo perfiles autorizados deben consultar datos sensibles."
+      ],
+      code: `# Mini ejemplo: detección básica de estudiantes en riesgo con Pandas
+import pandas as pd
+
+df = pd.read_csv("datos_estudiantes.csv")
+
+# Calcular promedio y detectar riesgo
+df["Promedio"] = df[["Examen1", "Examen2", "Tareas"]].mean(axis=1)
+df["EnRiesgo"] = df["Promedio"] < 50
+
+# Mostrar estudiantes en riesgo
+print(df[df["EnRiesgo"] == True])
+
+# Idea clave:
+# - Los datos se procesan
+# - Se transforma información en una señal útil
+# - Esa señal puede alimentar un dashboard, un informe o una alerta`
+    }
+  ],
+  extras: [
+    {
+      title: "Resultados de aprendizaje (qué deberían dominar)",
+      p: [
+        "Identificar problemas educativos que puedan abordarse mediante Learning Analytics, diferenciando necesidades pedagógicas, analíticas y tecnológicas.",
+        "Definir objetivos claros para una herramienta de Learning Analytics, conectando datos, análisis y toma de decisiones.",
+        "Programar soluciones básicas en Python para recoger, procesar y analizar datos educativos.",
+        "Comprender el papel de APIs y plataformas LMS en la integración automática de información.",
+        "Diseñar formas efectivas de comunicar resultados mediante dashboards, informes y alertas.",
+        "Aplicar criterios éticos y de privacidad en el uso de datos educativos."
+      ]
+    },
+    {
+      title: "Idea de práctica para enlazar con tu web (HTML5)",
+      p: [
+        "Actividad sugerida: 'Mini Learning Analytics Lab'. La app permite cargar un CSV ficticio de estudiantes, calcular medias, detectar alumnado en riesgo, generar una alerta simple y visualizar los resultados con gráficos y tarjetas de resumen. Como ampliación, se puede simular un dashboard docente y una vista estudiante con métricas más limitadas para trabajar también el control de acceso y la privacidad."
+      ]
+    }
+  ]
+}
+  
 //------------------------------------------------------------------------------------------------------------------------------
 //
 //
