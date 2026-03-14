@@ -46,6 +46,26 @@
     }
 
     .wrap{max-width:1380px;margin:0 auto;padding:24px}
+    #btnThemeFloating{
+      position:fixed;
+      top:16px;
+      right:16px;
+      z-index:9999;
+      width:54px;
+      height:54px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:linear-gradient(135deg,var(--accent),#3977ff);
+      color:white;
+      font-size:22px;
+      font-weight:900;
+      box-shadow:0 10px 30px rgba(0,0,0,.28);
+      cursor:pointer;
+    }
+    body.light #btnThemeFloating{
+      background:linear-gradient(135deg,#ffffff,#eaf2ff);
+      color:#1d3557;
+    }
     .hero{
       display:grid;
       grid-template-columns:1.25fr .9fr;
@@ -160,6 +180,7 @@
   </style>
 </head>
 <body>
+  <button id="btnThemeFloating" title="Cambiar tema">🌙</button>
   <div class="wrap">
     <section class="hero">
       <div class="panel hero-main">
@@ -197,7 +218,7 @@
           <div class="button-row" style="margin-top:0">
             <button class="primary" id="btnSample">Cargar cohorte ejemplo</button>
             <button id="btnRandom">Generar cohorte aleatoria</button>
-            <button id="btnTheme">Dark / Light</button>
+            <button id="btnTheme" title="Cambiar tema">🌙 Modo oscuro</button>
           </div>
         </div>
 
@@ -551,7 +572,30 @@
 
     document.getElementById('btnSample').addEventListener('click', loadSample);
     document.getElementById('btnRandom').addEventListener('click', loadRandom);
-    document.getElementById('btnTheme').addEventListener('click', ()=> document.body.classList.toggle('light'));
+    const btnTheme = document.getElementById('btnTheme');
+    const btnThemeFloating = document.getElementById('btnThemeFloating');
+
+    function setThemeButton(){
+      const isLight = document.body.classList.contains('light');
+      btnTheme.textContent = isLight ? '☀️ Modo claro' : '🌙 Modo oscuro';
+      btnThemeFloating.textContent = isLight ? '☀️' : '🌙';
+    }
+
+    function applySavedTheme(){
+      const saved = localStorage.getItem('mla-theme');
+      if(saved === 'light') document.body.classList.add('light');
+      else document.body.classList.remove('light');
+      setThemeButton();
+    }
+
+    function toggleTheme(){
+      document.body.classList.toggle('light');
+      localStorage.setItem('mla-theme', document.body.classList.contains('light') ? 'light' : 'dark');
+      setThemeButton();
+    }
+
+    btnTheme.addEventListener('click', toggleTheme);
+    btnThemeFloating.addEventListener('click', toggleTheme);
     document.getElementById('btnCopy').addEventListener('click', async ()=>{
       try{
         await navigator.clipboard.writeText(els.report.value);
@@ -563,8 +607,10 @@
 
     [els.scoreRange, els.taskRange, els.inactiveRange, els.forumRange].forEach(el => el.addEventListener('input', render));
 
+    applySavedTheme();
     loadSample();
   </script>
 </body>
 </html>
+
 
